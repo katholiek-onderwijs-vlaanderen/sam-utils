@@ -41,13 +41,13 @@ module.exports = function (api, dateUtils) {
       }]
     };
     const ret = await dateUtils.manageDateChanges(school, options, api);
-    const promises = [];
     if(ret) {
+      const promises = [];
       ret.epds.forEach(epd => {
         promises.push(manageDatesForEducationalProgrammeDetail(epd, batch, oldStartDate, oldEndDate, school.type === 'SCHOOL'));
       });
+      await Promise.all(promises);
     }
-    await Promise.all(promises);
     return ret;
   };
 
@@ -102,11 +102,13 @@ module.exports = function (api, dateUtils) {
       }
     };
     const ret = await dateUtils.manageDateChanges(location, options, api);
-    const promises = [];
-    ret.epdLocations.forEach(epdLoc => {
-      promises.push(manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate, official));
-    });
-    await Promise.all(promises);
+    if(ret) {
+      const promises = [];
+      ret.epdLocations.forEach(epdLoc => {
+        promises.push(manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate, official));
+      });
+      await Promise.all(promises);
+    }
     return ret;
   };
 
@@ -122,11 +124,13 @@ module.exports = function (api, dateUtils) {
       }
     };
     const ret = await dateUtils.manageDateChanges(epd, options, api);
-    const promises = [];
-    ret.epdLocations.forEach(epdLoc => {
-      promises.push(manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate, official));
-    });
-    await Promise.all(promises);
+    if(ret) {
+      const promises = [];
+      ret.epdLocations.forEach(epdLoc => {
+        promises.push(manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate, official));
+      });
+      await Promise.all(promises);
+    }
     return ret;
   };
 
