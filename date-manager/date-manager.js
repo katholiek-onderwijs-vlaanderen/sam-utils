@@ -44,7 +44,7 @@ module.exports = function (api, dateUtils) {
     if(ret) {
       const promises = [];
       ret.epds.forEach(epd => {
-        promises.push(manageDatesForEducationalProgrammeDetail(epd, batch, oldStartDate, oldEndDate, school.type === 'SCHOOL'));
+        promises.push(manageDatesForEducationalProgrammeDetail(epd, batch, oldStartDate, oldEndDate));
       });
       await Promise.all(promises);
     }
@@ -87,7 +87,7 @@ module.exports = function (api, dateUtils) {
     return dateUtils.manageDateChanges(clb, options, api);
   };
 
-  const manageDatesForSchoolLocation = async function(location, batch, oldStartDate, oldEndDate, official) {
+  const manageDatesForSchoolLocation = async function(location, batch, oldStartDate, oldEndDate, adaptEpds) {
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
@@ -105,14 +105,14 @@ module.exports = function (api, dateUtils) {
     if(ret) {
       const promises = [];
       ret.epdLocations.forEach(epdLoc => {
-        promises.push(manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate, official));
+        promises.push(manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds));
       });
       await Promise.all(promises);
     }
     return ret;
   };
 
-  const manageDatesForEducationalProgrammeDetail = async function(epd, batch, oldStartDate, oldEndDate, official) {
+  const manageDatesForEducationalProgrammeDetail = async function(epd, batch, oldStartDate, oldEndDate) {
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
@@ -127,24 +127,36 @@ module.exports = function (api, dateUtils) {
     if(ret) {
       const promises = [];
       ret.epdLocations.forEach(epdLoc => {
-        promises.push(manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate, official));
+        promises.push(manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate));
       });
       await Promise.all(promises);
     }
     return ret;
   };
 
-  const manageDatesForEducationalProgrammeDetailLocation = function(epdLoc, batch, oldStartDate, oldEndDate, official) {
+  const manageDatesForEducationalProgrammeDetailLocation = function(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds) {
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
       batch: batch,
-      references: {
-        href: '/educationalProgrammeDetails/locations/relations',
-        property: official ? 'to' : 'from',
+      references: [{
+        href: '/educationalprogrammedetails/locations/relations',
+        property: 'to',
         alias: 'relations'
-      }
+      },
+      {
+        href: '/educationalprogrammedetails/locations/relations',
+        property: 'from',
+        alias: 'relations'
+      }]
     };
+    if(adaptEpds) {
+      options.references.push({
+        href: '/educationalprogrammedetails',
+        property: 'educationalProgrammeDetail',
+        onlyEnlargePeriod: true
+      });
+    }
     return dateUtils.manageDateChanges(epdLoc, options, api);
   };
 
