@@ -1,9 +1,14 @@
+class EpdError {
+  constructor(message, body) {
+    this.message = message;
+    this.body = body;
+  }
+}
+
 const OKAN = '/commons/agsoorten/76fae745-2a07-11e5-be0a-00ffa0598608';
 const HBO = '/commons/agsoorten/76fae629-2a07-11e5-be0a-00ffa0598608';
 const MODULAIR = '/commons/agsoorten/3950a39a-2cc9-11e6-b392-005056872df5';
-/*
-needs to be expanded: buoType, mainstructure, leerjaar, graad, onderwijsvorm, structuuronderdeel, buoFase, buoOpleidingsvorm, buoOpleiding
-*/
+
 const sortEducationProgramme = function(epds, options) {
   epds.sort((a, b) => {
     if(options && options.path) {
@@ -16,10 +21,41 @@ const sortEducationProgramme = function(epds, options) {
     const epdA = a;
     const epdB = b;
     if(!a.ag) {
-      console.log(JSON.stringify(a));
+      throw new EpdError('The first argument needs to be an array of educational programme details!', a);
     }
     a = a.ag.$$expanded;
     b = b.ag.$$expanded;
+    //check if all the necessary properties are expanded
+    if(!a.mainstructure.$$expanded) {
+      throw new EpdError('The mainstructure of the AG needs to be expanded!', a);
+    }
+    if(a.soort && !a.soort.$$expanded) {
+      throw new EpdError('The soort of the AG needs to be expanded!', a);
+    }
+    if(a.leerjaar && !a.leerjaar.$$expanded) {
+      throw new EpdError('The leerjaar of the AG needs to be expanded!', a);
+    }
+    if(a.graad && !a.graad.$$expanded) {
+      throw new EpdError('The graad of the AG needs to be expanded!', a);
+    }
+    if(a.structuuronderdeel && !a.structuuronderdeel.$$expanded) {
+      throw new EpdError('The structuuronderdeel of the AG needs to be expanded!', a);
+    }
+    if(a.onderwijsvorm && !a.onderwijsvorm.$$expanded) {
+      throw new EpdError('The onderwijsvorm of the AG needs to be expanded!', a);
+    }
+    if(epdA.buoType && !epdA.buoType.$$expanded) {
+      throw new EpdError('The buoType of the educational programme detail needs to be expanded!', epdA);
+    }
+    if(a.buoFase && !a.buoFase.$$expanded) {
+      throw new EpdError('The buoFase of the AG needs to be expanded!', a);
+    }
+    if(a.buoOpleidingsvorm && !a.buoOpleidingsvorm.$$expanded) {
+      throw new EpdError('The buoOpleidingsvorm of the AG needs to be expanded!', a);
+    }
+    if(a.buoOpleiding && !a.buoOpleiding.$$expanded) {
+      throw new EpdError('The buoOpleiding of the AG needs to be expanded!', a);
+    }
     if(a.mainstructure.href !== b.mainstructure.href) { // first criteria is always mainstructure
       return a.mainstructure.$$expanded.code - b.mainstructure.$$expanded.code;
     } else if (a.mainstructure.$$expanded.code === 111 || a.mainstructure.$$expanded.code === 211) {
