@@ -20,7 +20,7 @@ const sortEducationProgramme = function(epds, options) {
     }
     const epdA = a;
     const epdB = b;
-    if(options.rawAg) {
+    if(!options.rawAgs) {
       if(!a.ag) {
         throw new EpdError('The first argument needs to be an array of educational programme details!', a);
       }
