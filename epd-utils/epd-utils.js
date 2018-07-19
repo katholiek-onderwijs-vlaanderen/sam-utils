@@ -63,7 +63,7 @@ const sortEducationProgramme = function(epds, options) {
       if(epdA.buoType) {
         return epdA.buoType.$$expanded.code - epdB.buoType.$$expanded.code; // buitengewoon basis -> buoType
       } else {
-        return a.code - b.code;
+        return a.name < b.name ? -1 : 1;
       }
     } else if (a.mainstructure.$$expanded.code === 311) { // for 311
       if(a.soort.href === OKAN || b.soort.href === OKAN) {
