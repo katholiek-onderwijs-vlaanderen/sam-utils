@@ -118,10 +118,10 @@ const sortEducationProgramme = function(epds, options) {
         } else if(a.buoOpleidingsvorm.$$expanded.code === "OV3") {
           if(epdA.buoType && epdA.buoType.href !== epdB.buoType.href) {
             return epdA.buoType.$$expanded.code < epdB.buoType.$$expanded.code ? -1 : 1;
-          } else if(a.buoFase.href !== b.buoFase.href) {
-            return a.buoFase.$$expanded.sortOrder - b.buoFase.$$expanded.sortOrder;
           } else if(a.buoOpleiding.href !== b.buoOpleiding.href) {
             return a.buoOpleiding.$$expanded.name < b.buoOpleiding.$$expanded.name ? -1 : 1;
+          } else if(a.buoFase.href !== b.buoFase.href) {
+            return a.buoFase.$$expanded.sortOrder - b.buoFase.$$expanded.sortOrder;
           } else {
             return a.leerjaar.$$expanded.code - b.leerjaar.$$expanded.code;
           }
