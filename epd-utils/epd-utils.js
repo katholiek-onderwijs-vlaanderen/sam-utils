@@ -20,11 +20,13 @@ const sortEducationProgramme = function(epds, options) {
     }
     const epdA = a;
     const epdB = b;
-    if(!a.ag) {
-      throw new EpdError('The first argument needs to be an array of educational programme details!', a);
+    if(options.rawAg) {
+      if(!a.ag) {
+        throw new EpdError('The first argument needs to be an array of educational programme details!', a);
+      }
+      a = a.ag.$$expanded;
+      b = b.ag.$$expanded;
     }
-    a = a.ag.$$expanded;
-    b = b.ag.$$expanded;
     //check if all the necessary properties are expanded
     if(!a.mainstructure.$$expanded) {
       throw new EpdError('The mainstructure of the AG needs to be expanded!', a);
@@ -58,7 +60,11 @@ const sortEducationProgramme = function(epds, options) {
     } else if (a.mainstructure.$$expanded.code === 111 || a.mainstructure.$$expanded.code === 211) {
       return a.leerjaar.$$expanded.code - b.leerjaar.$$expanded.code; // gewoon basis -> leerjaar
     } else if (a.mainstructure.$$expanded.code === 121 || a.mainstructure.$$expanded.code === 221) {
-      return epdA.buoType.$$expanded.code - epdB.buoType.$$expanded.code; // buitengewoon basis -> buoType
+      if(epdA.buoType) {
+        return epdA.buoType.$$expanded.code - epdB.buoType.$$expanded.code; // buitengewoon basis -> buoType
+      } else {
+        return a.code - b.code;
+      }
     } else if (a.mainstructure.$$expanded.code === 311) { // for 311
       if(a.soort.href === OKAN || b.soort.href === OKAN) {
         return a.soort.href === OKAN ? -1 : 1; // OKAN is always first
@@ -104,13 +110,13 @@ const sortEducationProgramme = function(epds, options) {
         if(a.buoOpleidingsvorm.$$expanded.code === "OV1") {
           return epdA.buoType.$$expanded.code < epdB.buoType.$$expanded.code ? -1 : 1;
         } else if(a.buoOpleidingsvorm.$$expanded.code === "OV2") {
-          if(epdA.buoType.href !== epdB.buoType.href) {
+          if(epdA.buoType && epdA.buoType.href !== epdB.buoType.href) {
             return epdA.buoType.$$expanded.code < epdB.buoType.$$expanded.code ? -1 : 1;
           } else {
             return a.buoFase.$$expanded.sortOrder - b.buoFase.$$expanded.sortOrder;
           }
         } else if(a.buoOpleidingsvorm.$$expanded.code === "OV3") {
-          if(epdA.buoType.href !== epdB.buoType.href) {
+          if(epdA.buoType && epdA.buoType.href !== epdB.buoType.href) {
             return epdA.buoType.$$expanded.code < epdB.buoType.$$expanded.code ? -1 : 1;
           } else if(a.buoFase.href !== b.buoFase.href) {
             return a.buoFase.$$expanded.sortOrder - b.buoFase.$$expanded.sortOrder;
@@ -136,7 +142,7 @@ const sortEducationProgramme = function(epds, options) {
             } else */
             if(a.structuuronderdeel.href !== b.structuuronderdeel.href) {
               return a.structuuronderdeel.$$expanded.name < b.structuuronderdeel.$$expanded.name ? -1 : 1;
-            } else if(epdA.buoType.href !== epdB.buoType.href) {
+            } else if(epdA.buoType && epdA.buoType.href !== epdB.buoType.href) {
               return epdA.buoType.$$expanded.code < epdB.buoType.$$expanded.code ? -1 : 1;
             } else {
               return a.leerjaar.$$expanded.code - b.leerjaar.$$expanded.code;
