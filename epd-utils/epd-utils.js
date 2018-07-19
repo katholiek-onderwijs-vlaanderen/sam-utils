@@ -29,9 +29,6 @@ const sortEducationProgramme = function(epds, options) {
     if(!a.mainstructure.$$expanded) {
       throw new EpdError('The mainstructure of the AG needs to be expanded!', a);
     }
-    if(a.soort && !a.soort.$$expanded) {
-      throw new EpdError('The soort of the AG needs to be expanded!', a);
-    }
     if(a.leerjaar && !a.leerjaar.$$expanded) {
       throw new EpdError('The leerjaar of the AG needs to be expanded!', a);
     }
@@ -75,8 +72,6 @@ const sortEducationProgramme = function(epds, options) {
             return 1;
           } else if (b.soort.href === HBO) {
             return -1;
-          } else {
-            console.log('This should not happen!');
           }
         } else {
           return a.structuuronderdeel.$$expanded.name < b.structuuronderdeel.$$expanded.name ? -1 : 1;
@@ -112,13 +107,13 @@ const sortEducationProgramme = function(epds, options) {
           if(epdA.buoType.href !== epdB.buoType.href) {
             return epdA.buoType.$$expanded.code < epdB.buoType.$$expanded.code ? -1 : 1;
           } else {
-            return a.buoFase.$$expanded.code < b.buoFase.$$expanded.code ? -1 : 1;
+            return a.buoFase.$$expanded.sortOrder - b.buoFase.$$expanded.sortOrder;
           }
         } else if(a.buoOpleidingsvorm.$$expanded.code === "OV3") {
           if(epdA.buoType.href !== epdB.buoType.href) {
             return epdA.buoType.$$expanded.code < epdB.buoType.$$expanded.code ? -1 : 1;
           } else if(a.buoFase.href !== b.buoFase.href) {
-            return a.buoFase.$$expanded.code < b.buoFase.$$expanded.code ? -1 : 1;
+            return a.buoFase.$$expanded.sortOrder - b.buoFase.$$expanded.sortOrder;
           } else if(a.buoOpleiding.href !== b.buoOpleiding.href) {
             return a.buoOpleiding.$$expanded.name < b.buoOpleiding.$$expanded.name ? -1 : 1;
           } else {
