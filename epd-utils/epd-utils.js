@@ -9,7 +9,7 @@ const OKAN = '/commons/agsoorten/76fae745-2a07-11e5-be0a-00ffa0598608';
 const HBO = '/commons/agsoorten/76fae629-2a07-11e5-be0a-00ffa0598608';
 const MODULAIR = '/commons/agsoorten/3950a39a-2cc9-11e6-b392-005056872df5';
 
-const sortEducationProgramme = function(epds, options) {
+const sortEducationProgramme = function(epds, options = {}) {
   epds.sort((a, b) => {
     if(options && options.path) {
       const words = options.path.split('.');
@@ -20,7 +20,7 @@ const sortEducationProgramme = function(epds, options) {
     }
     const epdA = a;
     const epdB = b;
-    if(!options || !options.rawAgs) {
+    if(!options.rawAgs) {
       if(!a.ag) {
         throw new EpdError('The first argument needs to be an array of educational programme details!', a);
       }
