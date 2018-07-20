@@ -68,7 +68,7 @@ const sortEducationProgramme = function(epds, options = {}) {
     } else if (a.mainstructure.$$expanded.code === 311) { // for 311
       if(a.soort.href === OKAN || b.soort.href === OKAN) {
         return a.soort.href === OKAN ? -1 : 1; // OKAN is always first
-      } else if(a.soort.href !== b.soort.href && (a.soort.href === HBO || b.soort.href === HBO || a.soort.href === MODULAIR || b.soort.href === MODULAIR)) {
+      } else if(a.soort.href === HBO || b.soort.href === HBO || a.soort.href === MODULAIR || b.soort.href === MODULAIR) {
         if(a.soort.href !== b.soort.href) {
           if(a.soort.href === MODULAIR) {
             return 1;
@@ -126,6 +126,17 @@ const sortEducationProgramme = function(epds, options = {}) {
             return a.leerjaar.$$expanded.code - b.leerjaar.$$expanded.code;
           }
         } else if(a.buoOpleidingsvorm.$$expanded.code === "OV4") {
+          /*if(a.soort.href === MODULAIR || b.soort.href === MODULAIR) {
+            if(a.soort.href !== b.soort.href) {
+              if(a.soort.href === MODULAIR) {
+                return 1;
+              } else if (b.soort.href === MODULAIR) {
+                return -1;
+              }
+            } else {
+              return a.structuuronderdeel.$$expanded.name < b.structuuronderdeel.$$expanded.name ? -1 : 1;
+            }
+          }*/
           if(a.graad.href !== b.graad.href) { // 1. order on graad
             return a.graad.$$expanded.code - b.graad.$$expanded.code;
           } else if(a.graad.$$expanded.code === 1) { // for 1ste graad: 1. leerjaar, 2. structuuronderdeel 3. buoType
