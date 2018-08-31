@@ -167,5 +167,6 @@ const sortEducationProgramme = function(epds, options = {}) {
 };
 
 module.exports = {
-  sortEducationProgramme: sortEducationProgramme
+  sortEducationProgramme: sortEducationProgramme,
+  EpdError: EpdError
 };
