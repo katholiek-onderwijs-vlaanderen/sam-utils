@@ -120,6 +120,7 @@ module.exports = function (api, dateUtils) {
       references: {
         href: '/educationalProgrammeDetails/locations',
         property: 'educationalProgrammeDetail',
+        onlyShortenPeriod: true,
         alias: 'epdLocations'
       }
     };
