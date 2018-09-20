@@ -60,8 +60,8 @@ const sortEducationProgramme = function(epds, options = {}) {
     } else if (a.mainstructure.$$expanded.code === 111 || a.mainstructure.$$expanded.code === 211) {
       return a.leerjaar.$$expanded.code - b.leerjaar.$$expanded.code; // gewoon basis -> leerjaar
     } else if (a.mainstructure.$$expanded.code === 121 || a.mainstructure.$$expanded.code === 221) {
-      if(epdA.buoType && epdB.buoType) {
-        return epdA.buoType.$$expanded.code - epdB.buoType.$$expanded.code; // buitengewoon basis -> buoType
+      if(a.buoType && b.buoType) {
+        return a.buoType.$$expanded.code - b.buoType.$$expanded.code; // buitengewoon basis -> buoType which is on AG level
       } else {
         return a.name < b.name ? -1 : 1;
       }
