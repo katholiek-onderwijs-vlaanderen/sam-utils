@@ -117,13 +117,13 @@ const sortEducationProgramme = function(epds, options = {}) {
             return a.buoFase.$$expanded.sortOrder - b.buoFase.$$expanded.sortOrder;
           }
         } else if(a.buoOpleidingsvorm.$$expanded.code === "OV3") {
-          if(epdA.buoType !== epdB.buoType) {
-            if(epdA.buoType && !epdB.buoType) {
-              return 1;
-            }
-            if(!epdA.buoType && epdB.buoType) {
-              return -1;
-            }
+          if(epdA.buoType && !epdB.buoType) {
+            return 1;
+          }
+          if(!epdA.buoType && epdB.buoType) {
+            return -1;
+          }
+          if(epdA.buoType && epdB.buoType && epdA.buoType.href !== epdB.buoType.href) {
             return epdA.buoType.$$expanded.code < epdB.buoType.$$expanded.code ? -1 : 1;
           } else if(a.buoOpleiding.href === OBSERVATIEJAAR) {
             return -1;
@@ -155,13 +155,11 @@ const sortEducationProgramme = function(epds, options = {}) {
               return a.leerjaar.$$expanded.code - b.leerjaar.$$expanded.code;
             } else if(a.structuuronderdeel.href !== b.structuuronderdeel.href) {
               return a.structuuronderdeel.$$expanded.name < b.structuuronderdeel.$$expanded.name ? -1 : 1;
-            } else if(epdA.buoType !== epdB.buoType) {
-              if(epdA.buoType && !epdB.buoType) {
-                return 1;
-              }
-              if(!epdA.buoType && epdB.buoType) {
-                return -1;
-              }
+            } else if(epdA.buoType && !epdB.buoType) {
+              return 1;
+            } else if(!epdA.buoType && epdB.buoType) {
+              return -1;
+            } else if(epdA.buoType && epdB.buoType && epdA.buoType.href !== epdB.buoType.href) {
               return epdA.buoType.$$expanded.code < epdB.buoType.$$expanded.code ? -1 : 1;
             }
           } else { // for 2de & 3de graad: 1. structuuronderdeel 2. buoType 3. leerjaar, no onderwijsvorm
@@ -170,13 +168,11 @@ const sortEducationProgramme = function(epds, options = {}) {
             } else */
             if(a.structuuronderdeel.href !== b.structuuronderdeel.href) {
               return a.structuuronderdeel.$$expanded.name < b.structuuronderdeel.$$expanded.name ? -1 : 1;
-            } else if(epdA.buoType !== epdB.buoType) {
-              if(epdA.buoType && !epdB.buoType) {
-                return 1;
-              }
-              if(!epdA.buoType && epdB.buoType) {
-                return -1;
-              }
+            } else if(epdA.buoType && !epdB.buoType) {
+              return 1;
+            } else if(!epdA.buoType && epdB.buoType) {
+              return -1;
+            } else if(epdA.buoType && epdB.buoType && epdA.buoType.href !== epdB.buoType.href) {
               return epdA.buoType.$$expanded.code < epdB.buoType.$$expanded.code ? -1 : 1;
             } else {
               return a.leerjaar.$$expanded.code - b.leerjaar.$$expanded.code;
