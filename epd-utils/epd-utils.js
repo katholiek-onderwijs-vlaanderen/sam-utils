@@ -8,6 +8,7 @@ class EpdError {
 const OKAN = '/commons/agsoorten/76fae745-2a07-11e5-be0a-00ffa0598608';
 const HBO = '/commons/agsoorten/76fae629-2a07-11e5-be0a-00ffa0598608';
 const MODULAIR = '/commons/agsoorten/3950a39a-2cc9-11e6-b392-005056872df5';
+const OBSERVATIEJAAR = '/commons/buoopleidingen/cfadd072-77ef-11e5-a3ab-005056872df5';
 
 const sortEducationProgramme = function(epds, options = {}) {
   epds.sort((a, b) => {
@@ -116,8 +117,16 @@ const sortEducationProgramme = function(epds, options = {}) {
             return a.buoFase.$$expanded.sortOrder - b.buoFase.$$expanded.sortOrder;
           }
         } else if(a.buoOpleidingsvorm.$$expanded.code === "OV3") {
-          if(epdA.buoType && epdB.buoType && epdA.buoType.href !== epdB.buoType.href) {
+          if(epdA.buoType && !epdB.buoType) {
+            return 1;
+          } else if(!epdA.buoType && epdB.buoType) {
+            return -1;
+          } else if(epdA.buoType && epdB.buoType && epdA.buoType.href !== epdB.buoType.href) {
             return epdA.buoType.$$expanded.code < epdB.buoType.$$expanded.code ? -1 : 1;
+          } else if(epdA.buoOpleiding.href === OBSERVATIEJAAR) {
+            return -1;
+          } else if(epdB.buoOpleiding.href === OBSERVATIEJAAR) {
+            return 1;
           } else if(a.buoOpleiding.href !== b.buoOpleiding.href) {
             return a.buoOpleiding.$$expanded.name < b.buoOpleiding.$$expanded.name ? -1 : 1;
           } else if(a.buoFase.href !== b.buoFase.href) {
@@ -144,6 +153,10 @@ const sortEducationProgramme = function(epds, options = {}) {
               return a.leerjaar.$$expanded.code - b.leerjaar.$$expanded.code;
             } else if(a.structuuronderdeel.href !== b.structuuronderdeel.href) {
               return a.structuuronderdeel.$$expanded.name < b.structuuronderdeel.$$expanded.name ? -1 : 1;
+            } else if(epdA.buoType && !epdB.buoType) {
+              return 1;
+            } else if(!epdA.buoType && epdB.buoType) {
+              return -1;
             } else if(epdA.buoType && epdB.buoType) {
               return epdA.buoType.$$expanded.code - epdB.buoType.$$expanded.code;
             }
@@ -153,6 +166,10 @@ const sortEducationProgramme = function(epds, options = {}) {
             } else */
             if(a.structuuronderdeel.href !== b.structuuronderdeel.href) {
               return a.structuuronderdeel.$$expanded.name < b.structuuronderdeel.$$expanded.name ? -1 : 1;
+            } else if(epdA.buoType && !epdB.buoType) {
+              return 1;
+            } else if(!epdA.buoType && epdB.buoType) {
+              return -1;
             } else if(epdA.buoType && epdB.buoType && epdA.buoType.href !== epdB.buoType.href) {
               return epdA.buoType.$$expanded.code < epdB.buoType.$$expanded.code ? -1 : 1;
             } else {
