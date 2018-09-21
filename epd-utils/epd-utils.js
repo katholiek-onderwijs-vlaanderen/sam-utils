@@ -123,9 +123,9 @@ const sortEducationProgramme = function(epds, options = {}) {
             return -1;
           } else if(epdA.buoType && epdB.buoType && epdA.buoType.href !== epdB.buoType.href) {
             return epdA.buoType.$$expanded.code < epdB.buoType.$$expanded.code ? -1 : 1;
-          } else if(epdA.buoOpleiding.href === OBSERVATIEJAAR) {
+          } else if(a.buoOpleiding.href === OBSERVATIEJAAR) {
             return -1;
-          } else if(epdB.buoOpleiding.href === OBSERVATIEJAAR) {
+          } else if(b.buoOpleiding.href === OBSERVATIEJAAR) {
             return 1;
           } else if(a.buoOpleiding.href !== b.buoOpleiding.href) {
             return a.buoOpleiding.$$expanded.name < b.buoOpleiding.$$expanded.name ? -1 : 1;
