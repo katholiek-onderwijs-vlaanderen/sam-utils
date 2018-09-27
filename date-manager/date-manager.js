@@ -61,12 +61,12 @@ module.exports = function (api, dateUtils) {
     }
     return ret;
   };
-  const manageDeletesForSchool = async function(school, batch, oldStartDate, oldEndDate) {
-    const options = getOptionsForSchool(school, batch, oldStartDate, oldEndDate);
+  const manageDeletesForSchool = async function(school, batch) {
+    const options = getOptionsForSchool(school, batch);
     const ret = await dateUtils.manageDeletes(school, options, api);
     if(ret) {
       for(let epd of ret.epds) {
-        await manageDeletesForEducationalProgrammeDetail(epd, batch, oldStartDate, oldEndDate);
+        await manageDeletesForEducationalProgrammeDetail(epd, batch);
       }
     }
     return ret;
@@ -108,7 +108,7 @@ module.exports = function (api, dateUtils) {
     return dateUtils.manageDateChanges(clb, options, api);
   };
 
-  const getOptionsForSchoolLocation = function(location, batch, oldStartDate, oldEndDate, adaptEpds) {
+  const getOptionsForSchoolLocation = function(location, batch, oldStartDate, oldEndDate) {
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
@@ -125,7 +125,7 @@ module.exports = function (api, dateUtils) {
     return options;
   };
   const manageDatesForSchoolLocation = async function(location, batch, oldStartDate, oldEndDate, adaptEpds) {
-    const options = getOptionsForSchoolLocation(location, batch, oldStartDate, oldEndDate, adaptEpds);
+    const options = getOptionsForSchoolLocation(location, batch, oldStartDate, oldEndDate);
     const ret = await dateUtils.manageDateChanges(location, options, api);
     if(ret) {
       for(let epdLoc of ret.epdLocations) {
@@ -134,12 +134,12 @@ module.exports = function (api, dateUtils) {
     }
     return ret;
   };
-  const manageDeletesForSchoolLocation = async function(location, batch, oldStartDate, oldEndDate, adaptEpds) {
-    const options = getOptionsForSchoolLocation(location, batch, oldStartDate, oldEndDate, adaptEpds);
+  const manageDeletesForSchoolLocation = async function(location, batch) {
+    const options = getOptionsForSchoolLocation(location, batch);
     const ret = await dateUtils.manageDeletes(location, options, api);
     if(ret) {
       for(let epdLoc of ret.epdLocations) {
-        await manageDeletesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds);
+        await manageDeletesForEducationalProgrammeDetailLocation(epdLoc, batch);
       }
     }
     return ret;
@@ -169,18 +169,18 @@ module.exports = function (api, dateUtils) {
     }
     return ret;
   };
-  const manageDeletesForEducationalProgrammeDetail = async function(epd, batch, oldStartDate, oldEndDate) {
-    const options = getOptionsForEducationalProgrammeDetail(epd, batch, oldStartDate, oldEndDate);
+  const manageDeletesForEducationalProgrammeDetail = async function(epd, batch) {
+    const options = getOptionsForEducationalProgrammeDetail(epd, batch);
     const ret = await dateUtils.manageDeletes(epd, options, api);
     if(ret) {
       for(let epdLoc of ret.epdLocations) {
-        await manageDeletesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate);
+        await manageDeletesForEducationalProgrammeDetailLocation(epdLoc, batch);
       }
     }
     return ret;
   };
 
-  const getOptionsForEducationalProgrammeDetailLocation = function(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds) {
+  const getOptionsForEducationalProgrammeDetailLocation = function(epdLoc, batch, oldStartDate, oldEndDate) {
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
@@ -199,7 +199,7 @@ module.exports = function (api, dateUtils) {
     return options;
   };
   const manageDatesForEducationalProgrammeDetailLocation = function(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds) {
-    const options = getOptionsForEducationalProgrammeDetailLocation;
+    const options = getOptionsForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate);
     if(adaptEpds) {
       options.references.push({
         href: '/educationalprogrammedetails',
@@ -209,15 +209,8 @@ module.exports = function (api, dateUtils) {
     }
     return dateUtils.manageDateChanges(epdLoc, options, api);
   };
-  const manageDeletesForEducationalProgrammeDetailLocation = function(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds) {
-    const options = getOptionsForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds);
-    if(adaptEpds) {
-      options.references.push({
-        href: '/educationalprogrammedetails',
-        property: 'educationalProgrammeDetail',
-        onlyEnlargePeriod: true
-      });
-    }
+  const manageDeletesForEducationalProgrammeDetailLocation = function(epdLoc, batch) {
+    const options = getOptionsForEducationalProgrammeDetailLocation(epdLoc, batch);
     return dateUtils.manageDeletes(epdLoc, options, api);
   };
 
