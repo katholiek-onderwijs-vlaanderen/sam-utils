@@ -188,14 +188,14 @@ module.exports = function (api, dateUtils) {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
       batch: batch,
-      references: {
+      references: [{
         href: '/educationalProgrammeDetails/locations',
         commonReference: 'physicalLocation',
         parameters: {
           'educationalProgrammeDetail.organisationalUnit': location.organisationalUnit.href
         },
         alias: 'epdLocations'
-      }
+      }]
     };
     if(!oldStartDate && !oldEndDate) {
       options.references.push({
