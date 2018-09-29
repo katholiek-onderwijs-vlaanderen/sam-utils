@@ -119,9 +119,11 @@ module.exports = function (api, dateUtils) {
       for(let epd of ret.epds) {
         await manageDatesForEducationalProgrammeDetail(epd, batch, oldStartDate, oldEndDate);
       }
+      ret.classes = [];
       for(let childRel of ret.childRels) {
         if(childRel.from.$$expanded.type === 'CLASS') {
-          manageDatesForSchool(childRel.from.$$expanded, batch, oldStartDate, oldEndDate);
+          ret.classes.push(childRel.from.$$expanded);
+          await manageDatesForSchool(childRel.from.$$expanded, batch, oldStartDate, oldEndDate);
         } else if(childRel.from.$$expanded.type === 'BUILDING') {
 
         }
