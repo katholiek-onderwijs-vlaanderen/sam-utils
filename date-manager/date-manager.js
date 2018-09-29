@@ -15,6 +15,18 @@ module.exports = function (api, dateUtils) {
         alias: 'relations'
       }
     };
+    if(!oldStartDate && !oldEndDate) {
+      options.references.push({
+        href: '/organisationalunits/externalidentifiers',
+        property: 'organisationalUnit',
+        alias: 'externalIdentifiers'
+      });
+      options.references.push({
+        href: '/organisationalunits/contactdetails',
+        property: 'organisationalUnit',
+        alias: 'contactDetails'
+      });
+    }
     return options;
   };
   const manageDatesForGoverningInstitution = function(governingInstitution, batch, oldStartDate, oldEndDate) {
@@ -26,6 +38,32 @@ module.exports = function (api, dateUtils) {
     return dateUtils.manageDeletes(governingInstitution, options, api);
   };
 
+  const managesDateChangesForSubOrganisations = async function(ou, batch, oldStartDate, oldEndDate) {
+    const options = {
+      oldStartDate: oldStartDate,
+      oldEndDate: oldEndDate,
+      batch: batch,
+      references: []
+    };
+    const ret = await dateUtils.manageDateChanges(ou, options, api);
+    if(ret) {
+
+    }
+  };
+
+  const manageDateChangesForClass = function(classOu, batch, oldStartDate, oldEndDate) {
+
+  };
+  const managaDeletesForClass = function(classOu, batch) {
+
+  };
+  const manageDateChangesForBuilding = function(building, batch, oldStartDate, oldEndDate) {
+
+  };
+  const managaDeletesForBuilding = function(building, batch, oldStartDate, oldEndDate) {
+
+  };
+
   const getOptionsForSchool = function(school, batch, oldStartDate, oldEndDate) {
     const options = {
       oldStartDate: oldStartDate,
@@ -34,9 +72,7 @@ module.exports = function (api, dateUtils) {
       properties: ['names'],
       references: [{
         href: '/organisationalunits/relations',
-        parameters: {
-          typeIn: 'GOVERNS,PROVIDES_SERVICES_TO'
-        },
+        parameters: {typeIn: 'GOVERNS,PROVIDES_SERVICES_TO'},
         property: 'to',
         alias: 'relations'
       }, {
@@ -47,8 +83,33 @@ module.exports = function (api, dateUtils) {
         href: '/educationalProgrammeDetails',
         property: 'organisationalUnit',
         alias: 'epds'
+      }, {
+        href: '/organisationalunits/relations',
+        parameters: {type: 'IS_PART_OF'},
+        property: 'from',
+        alias: 'parentRels'
+      }, {
+        href: '/organisationalunits/relations',
+        parameters: {
+          type: 'IS_PART_OF'
+        },
+        property: 'to',
+        subResources: ['from'],
+        alias: 'childRels'
       }]
     };
+    if(!oldStartDate && !oldEndDate) {
+      options.references.push({
+        href: '/organisationalunits/externalidentifiers',
+        property: 'organisationalUnit',
+        alias: 'externalIdentifiers'
+      });
+      options.references.push({
+        href: '/organisationalunits/contactdetails',
+        property: 'organisationalUnit',
+        alias: 'contactDetails'
+      });
+    }
     return options;
   };
   const manageDatesForSchool = async function(school, batch, oldStartDate, oldEndDate) {
@@ -57,6 +118,13 @@ module.exports = function (api, dateUtils) {
     if(ret) {
       for(let epd of ret.epds) {
         await manageDatesForEducationalProgrammeDetail(epd, batch, oldStartDate, oldEndDate);
+      }
+      for(let childRel of ret.childRels) {
+        if(childRel.from.$$expanded.type === 'CLASS') {
+          manageDatesForSchool(childRel.from.$$expanded, batch, oldStartDate, oldEndDate);
+        } else if(childRel.from.$$expanded.type === 'BUILDING') {
+
+        }
       }
     }
     return ret;
@@ -67,6 +135,13 @@ module.exports = function (api, dateUtils) {
     if(ret) {
       for(let epd of ret.epds) {
         await manageDeletesForEducationalProgrammeDetail(epd, batch);
+      }
+      for(let childRel of ret.childRels) {
+        if(childRel.from.$$expanded.type === 'CLASS') {
+          manageDeletesForSchool(childRel.from.$$expanded, batch);
+        } else if(childRel.from.$$expanded.type === 'BUILDING') {
+
+        }
       }
     }
     return ret;
@@ -122,6 +197,13 @@ module.exports = function (api, dateUtils) {
         alias: 'epdLocations'
       }
     };
+    if(!oldStartDate && !oldEndDate) {
+      options.references.push({
+        href: '/organisationalunits/externalidentifiers',
+        property: 'location',
+        alias: 'externalIdentifiers'
+      });
+    }
     return options;
   };
   const manageDatesForSchoolLocation = async function(location, batch, oldStartDate, oldEndDate, adaptEpds) {
@@ -188,12 +270,12 @@ module.exports = function (api, dateUtils) {
       references: [{
         href: '/educationalprogrammedetails/locations/relations',
         property: 'to',
-        alias: 'relations'
+        alias: 'relationsFrom'
       },
       {
         href: '/educationalprogrammedetails/locations/relations',
         property: 'from',
-        alias: 'relations'
+        alias: 'relationsTo'
       }]
     };
     return options;
