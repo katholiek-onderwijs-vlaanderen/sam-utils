@@ -201,7 +201,7 @@ module.exports = function (api, dateUtils) {
     };
     if(!oldStartDate && !oldEndDate) {
       options.references.push({
-        href: '/organisationalunits/externalidentifiers',
+        href: '/organisationalunits/locations/externalidentifiers',
         property: 'location',
         alias: 'externalIdentifiers'
       });
