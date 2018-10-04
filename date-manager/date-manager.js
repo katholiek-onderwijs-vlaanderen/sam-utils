@@ -4,6 +4,7 @@ module.exports = function (api, dateUtils) {
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
+      intermediateStrategy: 'ERROR',
       batch: batch,
       properties: ['names'],
       references: {
@@ -51,23 +52,11 @@ module.exports = function (api, dateUtils) {
     }
   };
 
-  const manageDateChangesForClass = function(classOu, batch, oldStartDate, oldEndDate) {
-
-  };
-  const managaDeletesForClass = function(classOu, batch) {
-
-  };
-  const manageDateChangesForBuilding = function(building, batch, oldStartDate, oldEndDate) {
-
-  };
-  const managaDeletesForBuilding = function(building, batch, oldStartDate, oldEndDate) {
-
-  };
-
   const getOptionsForSchool = function(school, batch, oldStartDate, oldEndDate) {
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
+      intermediateStrategy: 'ERROR',
       batch: batch,
       properties: ['names'],
       references: [{
@@ -124,8 +113,6 @@ module.exports = function (api, dateUtils) {
         if(childRel.from.$$expanded.type === 'CLASS') {
           ret.classes.push(childRel.from.$$expanded);
           await manageDatesForSchool(childRel.from.$$expanded, batch, oldStartDate, oldEndDate);
-        } else if(childRel.from.$$expanded.type === 'BUILDING') {
-
         }
       }
     }
@@ -141,8 +128,6 @@ module.exports = function (api, dateUtils) {
       for(let childRel of ret.childRels) {
         if(childRel.from.$$expanded.type === 'CLASS') {
           manageDeletesForSchool(childRel.from.$$expanded, batch);
-        } else if(childRel.from.$$expanded.type === 'BUILDING') {
-
         }
       }
     }
@@ -153,6 +138,7 @@ module.exports = function (api, dateUtils) {
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
+      intermediateStrategy: 'ERROR',
       batch: batch,
       properties: ['names'],
       references: [{
@@ -171,6 +157,7 @@ module.exports = function (api, dateUtils) {
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
+      intermediateStrategy: 'ERROR',
       batch: batch,
       properties: ['names'],
       references: [{
@@ -189,6 +176,7 @@ module.exports = function (api, dateUtils) {
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
+      intermediateStrategy: 'ERROR',
       batch: batch,
       references: [{
         href: '/educationalProgrammeDetails/locations',
@@ -233,6 +221,7 @@ module.exports = function (api, dateUtils) {
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
+      intermediateStrategy: 'ERROR',
       batch: batch,
       references: {
         href: '/educationalProgrammeDetails/locations',
@@ -268,6 +257,7 @@ module.exports = function (api, dateUtils) {
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
+      intermediateStrategy: 'ERROR',
       batch: batch,
       references: [{
         href: '/educationalprogrammedetails/locations/relations',
