@@ -39,19 +39,6 @@ module.exports = function (api, dateUtils) {
     return dateUtils.manageDeletes(governingInstitution, options, api);
   };
 
-  const managesDateChangesForSubOrganisations = async function(ou, batch, oldStartDate, oldEndDate) {
-    const options = {
-      oldStartDate: oldStartDate,
-      oldEndDate: oldEndDate,
-      batch: batch,
-      references: []
-    };
-    const ret = await dateUtils.manageDateChanges(ou, options, api);
-    if(ret) {
-
-    }
-  };
-
   const getOptionsForSchool = function(school, batch, oldStartDate, oldEndDate) {
     const options = {
       oldStartDate: oldStartDate,
@@ -105,8 +92,24 @@ module.exports = function (api, dateUtils) {
     const options = getOptionsForSchool(school, batch, oldStartDate, oldEndDate);
     const ret = await dateUtils.manageDateChanges(school, options, api);
     if(ret) {
+      let error = null;
       for(let epd of ret.epds) {
-        await manageDatesForEducationalProgrammeDetail(epd, batch, oldStartDate, oldEndDate, true);
+        try {
+          await manageDatesForEducationalProgrammeDetail(epd, batch, oldStartDate, oldEndDate, true);
+        } catch(err) {
+          if(err instanceof dateUtils.DateError) {
+            if(!error) {
+              error = err;
+            } else {
+              error.body = error.body.concat(err.body);
+            }
+          } else {
+            throw error;
+          }
+        }
+      }
+      if(error) {
+        throw error;
       }
       ret.classes = [];
       for(let childRel of ret.childRels) {
