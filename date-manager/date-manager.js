@@ -1,4 +1,5 @@
 module.exports = function (api, dateUtils) {
+  const classUtils = require('../class-utils')(api);
 
   const getOptionsForGoverningInstitution = function(governingInstitution, batch, oldStartDate, oldEndDate) {
     const options = {
@@ -39,7 +40,31 @@ module.exports = function (api, dateUtils) {
     return dateUtils.manageDeletes(governingInstitution, options, api);
   };
 
-  const getOptionsForSchool = function(school, batch, oldStartDate, oldEndDate) {
+  const getOptionsForClass = function(batch, oldStartDate, oldEndDate) {
+    const options = {
+      oldStartDate: oldStartDate,
+      oldEndDate: oldEndDate,
+      intermediateStrategy: 'ERROR',
+      batch: batch,
+      properties: ['names'],
+      references: [{
+        href: '/organisationalunits/locations',
+        property: 'organisationalUnit',
+        alias: 'locations'
+      }, {
+        href: '/educationalProgrammeDetails',
+        property: 'organisationalUnit',
+        alias: 'epds'
+      }, {
+        href: '/organisationalunits/relations',
+        parameters: {type: 'IS_PART_OF'},
+        property: 'from',
+        alias: 'parentRels'
+      }]
+    };
+    return options;
+  };
+  const getOptionsForSchool = function(batch, oldStartDate, oldEndDate) {
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
@@ -89,7 +114,8 @@ module.exports = function (api, dateUtils) {
     return options;
   };
   const manageDatesForSchool = async function(school, batch, oldStartDate, oldEndDate) {
-    const options = getOptionsForSchool(school, batch, oldStartDate, oldEndDate);
+    const isClass = school.type === 'CLASS';
+    const options = isClass ? getOptionsForClass(batch, oldStartDate, oldEndDate) : getOptionsForSchool(batch, oldStartDate, oldEndDate);
     const ret = await dateUtils.manageDateChanges(school, options, api);
     if(ret) {
       let error = null;
@@ -111,31 +137,37 @@ module.exports = function (api, dateUtils) {
       if(error) {
         throw error;
       }
-      ret.classes = [];
-      for(let childRel of ret.childRels) {
-        if(childRel.from.$$expanded.type === 'CLASS') {
+
+      if(!isClass) {
+        ret.classes = [];
+        for(let childRel of ret.childRels) {
           ret.classes.push(childRel.from.$$expanded);
-          await manageDatesForSchool(childRel.from.$$expanded, batch, oldStartDate, oldEndDate);
+          await manageDatesForClass(childRel.from.$$expanded, batch, oldStartDate, oldEndDate);
         }
       }
     }
     return ret;
   };
+  const manageDatesForClass = manageDatesForSchool;
   const manageDeletesForSchool = async function(school, batch) {
-    const options = getOptionsForSchool(school, batch);
+    const isClass = school.type === 'CLASS';
+    const options = isClass ? getOptionsForClass(batch) : getOptionsForSchool(batch);
     const ret = await dateUtils.manageDeletes(school, options, api);
     if(ret) {
       for(let epd of ret.epds) {
         await manageDeletesForEducationalProgrammeDetail(epd, batch);
       }
-      for(let childRel of ret.childRels) {
-        if(childRel.from.$$expanded.type === 'CLASS') {
-          manageDeletesForSchool(childRel.from.$$expanded, batch);
+      if(!isClass) {
+        ret.classes = [];
+        for(let childRel of ret.childRels) {
+          ret.classes.push(childRel.from.$$expanded);
+          await manageDeletesForClass(childRel.from.$$expanded, batch);
         }
       }
     }
     return ret;
   };
+  const manageDeletesForClass = manageDeletesForSchool;
 
   const manageDatesForBoarding = function(boarding, batch, oldStartDate, oldEndDate) {
     const options = {
@@ -190,6 +222,16 @@ module.exports = function (api, dateUtils) {
         alias: 'epdLocations'
       }]
     };
+    /*if(classes.length > 0) {
+      options.references.push({
+        href: 'organisationalunits/locations',
+        commonReference: 'physicalLocation',
+        parameters: {
+          'organisationalUnit': classes.map(c => c.from.href)
+        },
+        alias: 'classLocations'
+      });
+    }*/
     if(!oldStartDate && !oldEndDate) {
       options.references.push({
         href: '/organisationalunits/locations/externalidentifiers',
@@ -199,12 +241,29 @@ module.exports = function (api, dateUtils) {
     }
     return options;
   };
+
   const manageDatesForSchoolLocation = async function(location, batch, oldStartDate, oldEndDate, adaptEpds) {
     const options = getOptionsForSchoolLocation(location, batch, oldStartDate, oldEndDate);
     const ret = await dateUtils.manageDateChanges(location, options, api);
     if(ret) {
       for(let epdLoc of ret.epdLocations) {
         await manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds);
+      }
+    }
+    const classesAtSameLocation = await classUtils.getClassesAtSameLocation(location);
+    ret.classes = [];
+    for(let clazz of classesAtSameLocation) {
+      let changed = dateUtils.adaptPeriod(location, options, clazz);
+      if(changed) {
+        ret.classes.push(clazz);
+        if(batch) {
+          batch.push({
+            href: clazz.$$meta.permalink,
+            verb: 'PUT',
+            body: clazz
+          });
+        }
+        await manageDatesForClass(clazz, batch, oldStartDate, oldEndDate);
       }
     }
     return ret;
@@ -216,6 +275,17 @@ module.exports = function (api, dateUtils) {
       for(let epdLoc of ret.epdLocations) {
         await manageDeletesForEducationalProgrammeDetailLocation(epdLoc, batch);
       }
+    }
+    const classesAtSameLocation = await classUtils.getClassesAtSameLocation(location);
+    ret.classes = [classesAtSameLocation];
+    for(let clazz of classesAtSameLocation) {
+      if(batch) {
+        batch.push({
+          href: clazz.$$meta.permalink,
+          verb: 'DELETE'
+        });
+      }
+      await manageDatesForClass(clazz, batch);
     }
     return ret;
   };
