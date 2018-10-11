@@ -277,7 +277,7 @@ module.exports = function (api, dateUtils) {
       }
     }
     const classesAtSameLocation = await classUtils.getClassesAtSameLocation(location);
-    ret.classes = [classesAtSameLocation];
+    ret.classes = classesAtSameLocation;
     for(let clazz of classesAtSameLocation) {
       if(batch) {
         batch.push({
@@ -351,6 +351,7 @@ module.exports = function (api, dateUtils) {
       options.references.push({
         href: '/educationalprogrammedetails',
         property: 'educationalProgrammeDetail',
+        intermediateStrategy: 'FORCE',
         onlyEnlargePeriod: true
       });
     }
