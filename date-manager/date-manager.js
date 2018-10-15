@@ -273,7 +273,7 @@ module.exports = function (api, dateUtils) {
     const ret = await dateUtils.manageDeletes(location, options, api);
     if(ret) {
       for(let epdLoc of ret.epdLocations) {
-        await manageDeletesForEducationalProgrammeDetailLocation(epdLoc, batch);
+        await manageDeletesForEducationalProgrammeDetailLocation(epdLoc, batch, true);
       }
     }
     const classesAtSameLocation = await classUtils.getClassesAtSameLocation(location);
@@ -345,7 +345,7 @@ module.exports = function (api, dateUtils) {
     };
     return options;
   };
-  const manageDatesForEducationalProgrammeDetailLocation = function(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds) {
+  const manageDatesForEducationalProgrammeDetailLocation = async function(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds, adaptClasses) {
     const options = getOptionsForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate);
     if(adaptEpds) {
       options.references.push({
@@ -354,12 +354,49 @@ module.exports = function (api, dateUtils) {
         intermediateStrategy: 'FORCE',
         onlyEnlargePeriod: true
       });
+      await adaptEducationProgrammeDetailToAllLocations(epdLoc, batch, oldStartDate, oldEndDate);
     }
     return dateUtils.manageDateChanges(epdLoc, options, api);
   };
-  const manageDeletesForEducationalProgrammeDetailLocation = function(epdLoc, batch) {
+  const manageDeletesForEducationalProgrammeDetailLocation = async function(epdLoc, batch, adaptEpds) {
     const options = getOptionsForEducationalProgrammeDetailLocation(epdLoc, batch);
+    if(adaptEpds) {
+      await deleteEducationProgrammeDetailIfLastLocation(epdLoc, batch);
+    }
     return dateUtils.manageDeletes(epdLoc, options, api);
+  };
+
+  const adaptEducationProgrammeDetailToAllLocations = async (epdLoc, batch, oldStartDate, oldEndDate) => {
+    if(dateUtils.isAfter(epdLoc.startDate, oldStartDate) || dateUtils.isBefore(epdLoc.endDate, oldEndDate)) {
+      return;
+    }
+    const epd = epdLoc.educationalProgrammeDetail.$$expanded ? epdLoc.educationalProgrammeDetail.$$expanded : await api.get(epdLoc.educationalProgrammeDetail.href);
+    const allEpdLocs = await api.getAll('/educationalprogrammedetails/locations', {educationalProgrammeDetail: epdLoc.educationalProgrammeDetail.href});
+    const allOtherEpdLocs = allEpdLocs.filter(x => x.key !== epdLoc.key);
+    const minStart = allOtherEpdLocs.reduce((acc, val) => dateUtils.isBefore(val.startDate, acc) ? val.startDate : acc, epdLoc.startDate);
+    const maxEnd = allOtherEpdLocs.reduce((acc, val) => dateUtils.isAfter(val.endDate, acc) ? val.startDate : acc, epdLoc.endDate);
+    if(minStart !== epd.startDate || maxEnd !== epd.endDate) {
+      epd.startDate = minStart;
+      epd.endDate = maxEnd;
+      batch.push({
+        href: epdLoc.educationalProgrammeDetail.href,
+        verb: 'PUT',
+        body: epd
+      });
+      return epd;
+    }
+  };
+
+  const deleteEducationProgrammeDetailIfLastLocation = async (epdLoc, batch) => {
+    const allEpdLocs = await api.getAll('/educationalprogrammedetails/locations', {educationalProgrammeDetail: epdLoc.educationalProgrammeDetail.href});
+    const allOtherEpdLocs = allEpdLocs.filter(x => x.key !== epdLoc.key);
+    if(allOtherEpdLocs.length === 0) {
+      batch.push({
+        href: epdLoc.educationalProgrammeDetail.href,
+        verb: 'DELETE'
+      });
+      return true;
+    }
   };
 
   return {
@@ -374,6 +411,8 @@ module.exports = function (api, dateUtils) {
     manageDeletesForSchool: manageDeletesForSchool,
     manageDeletesForSchoolLocation: manageDeletesForSchoolLocation,
     manageDeletesForEducationalProgrammeDetail: manageDeletesForEducationalProgrammeDetail,
-    manageDeletesForEducationalProgrammeDetailLocation: manageDeletesForEducationalProgrammeDetailLocation
+    manageDeletesForEducationalProgrammeDetailLocation: manageDeletesForEducationalProgrammeDetailLocation,
+    adaptEducationProgrammeDetailToAllLocations: adaptEducationProgrammeDetailToAllLocations,
+    deleteEducationProgrammeDetailIfLastLocation: deleteEducationProgrammeDetailIfLastLocation
   };
 };
