@@ -263,7 +263,6 @@ module.exports = function (api, dateUtils) {
             body: classLocation
           });
         }
-        await manageDatesForClass(classLocation, batch, oldStartDate, oldEndDate);
       }
     }
     return ret;
@@ -383,6 +382,7 @@ module.exports = function (api, dateUtils) {
         verb: 'PUT',
         body: epd
       });
+      await adaptEducationalProgrammeDetailsOfClasses(epd, batch, oldStartDate, oldEndDate);
       return epd;
     }
   };
@@ -395,8 +395,46 @@ module.exports = function (api, dateUtils) {
         href: epdLoc.educationalProgrammeDetail.href,
         verb: 'DELETE'
       });
+      await deleteEducationalProgrammeDetailsOfClasses(await api.get(epdLoc.educationalProgrammeDetail.href), batch);
       return true;
     }
+  };
+
+  const adaptEducationalProgrammeDetailsOfClasses = async function(epd, batch, oldStartDate, oldEndDate) {
+    const options = {
+      oldStartDate: oldStartDate,
+      oldEndDate: oldEndDate,
+      intermediateStrategy: 'FORCE',
+      batch: batch
+    };
+    const classEpds = await classUtils.getClassEpdsForSameAg(epd);
+    const ret = [];
+    for(let classEpd of classEpds) {
+      let changed = dateUtils.adaptPeriod(epd, options, classEpd);
+      if(changed) {
+        ret.classes.push(classEpd);
+        if(batch) {
+          batch.push({
+            href: classEpd.$$meta.permalink,
+            verb: 'PUT',
+            body: classEpd
+          });
+        }
+      }
+    }
+    return ret;
+  };
+  const deleteEducationalProgrammeDetailsOfClasses = async function(epd, batch) {
+    const classEpds = await classUtils.getClassEpdsForSameAg(epd);
+    for(let classEpd of classEpds) {
+      if(batch) {
+        batch.push({
+          href: classEpd.$$meta.permalink,
+          verb: 'DELETE'
+        });
+      }
+    }
+    return classEpds;
   };
 
   return {
