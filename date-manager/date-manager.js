@@ -250,20 +250,20 @@ module.exports = function (api, dateUtils) {
         await manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds);
       }
     }
-    const classesAtSameLocation = await classUtils.getClassesAtSameLocation(location);
+    const classesAtSameLocation = await classUtils.getClassLocationsAtCampus(location);
     ret.classes = [];
-    for(let clazz of classesAtSameLocation) {
-      let changed = dateUtils.adaptPeriod(location, options, clazz);
+    for(let classLocation of classesAtSameLocation) {
+      let changed = dateUtils.adaptPeriod(location, options, classLocation);
       if(changed) {
-        ret.classes.push(clazz);
+        ret.classes.push(classLocation);
         if(batch) {
           batch.push({
-            href: clazz.$$meta.permalink,
+            href: classLocation.$$meta.permalink,
             verb: 'PUT',
-            body: clazz
+            body: classLocation
           });
         }
-        await manageDatesForClass(clazz, batch, oldStartDate, oldEndDate);
+        await manageDatesForClass(classLocation, batch, oldStartDate, oldEndDate);
       }
     }
     return ret;
@@ -276,7 +276,7 @@ module.exports = function (api, dateUtils) {
         await manageDeletesForEducationalProgrammeDetailLocation(epdLoc, batch, true);
       }
     }
-    const classesAtSameLocation = await classUtils.getClassesAtSameLocation(location);
+    const classesAtSameLocation = await classUtils.getClassesAtCampus(location);
     ret.classes = classesAtSameLocation;
     for(let clazz of classesAtSameLocation) {
       if(batch) {
