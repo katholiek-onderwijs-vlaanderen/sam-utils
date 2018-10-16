@@ -95,6 +95,7 @@ module.exports = function (api, dateUtils) {
           type: 'IS_PART_OF'
         },
         property: 'to',
+        intermediateStrategy: 'FORCE',
         subResources: ['from'],
         alias: 'childRels'
       }]
@@ -253,7 +254,7 @@ module.exports = function (api, dateUtils) {
     const classesAtSameLocation = await classUtils.getClassLocationsAtCampus(location);
     ret.classes = [];
     for(let classLocation of classesAtSameLocation) {
-      let changed = dateUtils.adaptPeriod(location, options, classLocation);
+      let changed = dateUtils.adaptPeriod(location, Object.assign({intermediateStrategy: 'FORCE'}, options), classLocation);
       if(changed) {
         ret.classes.push(classLocation);
         if(batch) {
