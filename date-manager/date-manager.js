@@ -345,15 +345,15 @@ module.exports = function (api, dateUtils) {
     };
     return options;
   };
-  const manageDatesForEducationalProgrammeDetailLocation = async function(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds, adaptClasses) {
+  const manageDatesForEducationalProgrammeDetailLocation = async function(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds) {
     const options = getOptionsForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate);
     if(adaptEpds) {
-      options.references.push({
+      /*options.references.push({
         href: '/educationalprogrammedetails',
         property: 'educationalProgrammeDetail',
         intermediateStrategy: 'FORCE',
         onlyEnlargePeriod: true
-      });
+      });*/
       await adaptEducationProgrammeDetailToAllLocations(epdLoc, batch, oldStartDate, oldEndDate);
     }
     return dateUtils.manageDateChanges(epdLoc, options, api);
@@ -367,23 +367,43 @@ module.exports = function (api, dateUtils) {
   };
 
   const adaptEducationProgrammeDetailToAllLocations = async (epdLoc, batch, oldStartDate, oldEndDate) => {
-    if(dateUtils.isAfter(epdLoc.startDate, oldStartDate) || dateUtils.isBefore(epdLoc.endDate, oldEndDate)) {
+    if(epdLoc.startDate === oldStartDate && epdLoc.endDate === oldEndDate) {
       return;
     }
     const epd = epdLoc.educationalProgrammeDetail.$$expanded ? epdLoc.educationalProgrammeDetail.$$expanded : await api.get(epdLoc.educationalProgrammeDetail.href);
-    const allEpdLocs = await api.getAll('/educationalprogrammedetails/locations', {educationalProgrammeDetail: epdLoc.educationalProgrammeDetail.href});
-    const allOtherEpdLocs = allEpdLocs.filter(x => x.key !== epdLoc.key);
-    const minStart = allOtherEpdLocs.reduce((acc, val) => dateUtils.isBefore(val.startDate, acc) ? val.startDate : acc, epdLoc.startDate);
-    const maxEnd = allOtherEpdLocs.reduce((acc, val) => dateUtils.isAfter(val.endDate, acc) ? val.startDate : acc, epdLoc.endDate);
-    if(minStart !== epd.startDate || maxEnd !== epd.endDate) {
-      epd.startDate = minStart;
-      epd.endDate = maxEnd;
+    const oldEpdStartDate = epd.startDate;
+    const oldEpdEndDate = epd.endDate;
+    let dirty = false;
+    //enlarge period
+    if(dateUtils.isBefore(epdLoc.startDate, epd)) {
+      epd.startDate = epdLoc.startDate;
+      dirty = true;
+    }
+    if(dateUtils.isAfter(epdLoc.endDate, epd)) {
+      epd.endDate = epdLoc.endDate;
+      dirty = true;
+    }
+    //shorten period;
+    if(dateUtils.isAfter(epdLoc.startDate, oldStartDate) || dateUtils.isBefore(epdLoc.endDate, oldEndDate)) {
+      const allEpdLocs = await api.getAll('/educationalprogrammedetails/locations', {educationalProgrammeDetail: epdLoc.educationalProgrammeDetail.href});
+      const allOtherEpdLocs = allEpdLocs.filter(x => x.key !== epdLoc.key);
+      const minStart = allOtherEpdLocs.reduce((acc, val) => dateUtils.isBefore(val.startDate, acc) ? val.startDate : acc, epdLoc.startDate);
+      const maxEnd = allOtherEpdLocs.reduce((acc, val) => dateUtils.isAfter(val.endDate, acc) ? val.startDate : acc, epdLoc.endDate);
+      if(minStart !== epd.startDate || maxEnd !== epd.endDate) {
+        epd.startDate = minStart;
+        epd.endDate = maxEnd;
+        dirty = true;
+      }
+    }
+    if(dirty) {
       batch.push({
         href: epdLoc.educationalProgrammeDetail.href,
         verb: 'PUT',
         body: epd
       });
-      await adaptEducationalProgrammeDetailsOfClasses(epd, batch, oldStartDate, oldEndDate);
+      if(epd.endDate !== oldEpdEndDate || dateUtils.isAfter(epd.startDate, oldEpdStartDate)) {
+        await adaptEducationalProgrammeDetailsOfClasses(epd, batch, oldStartDate, oldEndDate);
+      }
       return epd;
     }
   };
