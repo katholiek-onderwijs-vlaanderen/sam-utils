@@ -158,6 +158,9 @@ module.exports = function (api, dateUtils) {
       for(let epd of ret.epds) {
         await manageDeletesForEducationalProgrammeDetail(epd, batch);
       }
+      for(let loc of ret.locations) {
+        await manageDeletesForSchoolLocation(loc, batch, true);
+      }
       if(!isClass) {
         ret.classes = [];
         for(let childRel of ret.childRels) {
@@ -208,20 +211,13 @@ module.exports = function (api, dateUtils) {
     return dateUtils.manageDateChanges(clb, options, api);
   };
 
-  const getOptionsForSchoolLocation = function(location, batch, oldStartDate, oldEndDate) {
+  const getOptionsForSchoolLocation = function(location, batch, oldStartDate, oldEndDate, doNotAdaptSchoolDependencies) {
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
       intermediateStrategy: 'ERROR',
       batch: batch,
-      references: [{
-        href: '/educationalProgrammeDetails/locations',
-        commonReference: 'physicalLocation',
-        parameters: {
-          'educationalProgrammeDetail.organisationalUnit': location.organisationalUnit.href
-        },
-        alias: 'epdLocations'
-      }]
+      references: []
     };
     /*if(classes.length > 0) {
       options.references.push({
@@ -233,6 +229,16 @@ module.exports = function (api, dateUtils) {
         alias: 'classLocations'
       });
     }*/
+    if(!doNotAdaptSchoolDependencies) {
+      options.references.push({
+        href: '/educationalProgrammeDetails/locations',
+        commonReference: 'physicalLocation',
+        parameters: {
+          'educationalProgrammeDetail.organisationalUnit': location.organisationalUnit.href
+        },
+        alias: 'epdLocations'
+      });
+    }
     if(!oldStartDate && !oldEndDate) {
       options.references.push({
         href: '/organisationalunits/locations/externalidentifiers',
@@ -243,7 +249,7 @@ module.exports = function (api, dateUtils) {
     return options;
   };
 
-  const manageDatesForSchoolLocation = async function(location, batch, oldStartDate, oldEndDate, adaptEpds) {
+  const manageDatesForSchoolLocation = async function(location, batch, oldStartDate, oldEndDate, adaptEpds, ) {
     const options = getOptionsForSchoolLocation(location, batch, oldStartDate, oldEndDate);
     const ret = await dateUtils.manageDateChanges(location, options, api);
     if(ret) {
@@ -251,41 +257,45 @@ module.exports = function (api, dateUtils) {
         await manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds);
       }
     }
-    const classesAtSameLocation = await classUtils.getClassLocationsAtCampus(location);
-    ret.classes = [];
-    for(let classLocation of classesAtSameLocation) {
-      let changed = dateUtils.adaptPeriod(location, Object.assign({intermediateStrategy: 'FORCE'}, options), classLocation);
-      if(changed) {
-        ret.classes.push(classLocation);
-        if(batch) {
-          batch.push({
-            href: classLocation.$$meta.permalink,
-            verb: 'PUT',
-            body: classLocation
-          });
+
+      const classesAtSameLocation = await classUtils.getClassLocationsAtCampus(location);
+      ret.classes = [];
+      for(let classLocation of classesAtSameLocation) {
+        let changed = dateUtils.adaptPeriod(location, Object.assign({intermediateStrategy: 'FORCE'}, options), classLocation);
+        if(changed) {
+          ret.classes.push(classLocation);
+          if(batch) {
+            batch.push({
+              href: classLocation.$$meta.permalink,
+              verb: 'PUT',
+              body: classLocation
+            });
+          }
         }
       }
-    }
+
     return ret;
   };
-  const manageDeletesForSchoolLocation = async function(location, batch) {
+  const manageDeletesForSchoolLocation = async function(location, batch, doNotAdaptSchoolDependencies) {
     const options = getOptionsForSchoolLocation(location, batch);
     const ret = await dateUtils.manageDeletes(location, options, api);
-    if(ret) {
+    if(ret && !doNotAdaptSchoolDependencies) {
       for(let epdLoc of ret.epdLocations) {
         await manageDeletesForEducationalProgrammeDetailLocation(epdLoc, batch, true);
       }
     }
-    const classesAtSameLocation = await classUtils.getClassesAtCampus(location);
-    ret.classes = classesAtSameLocation;
-    for(let clazz of classesAtSameLocation) {
-      if(batch) {
-        batch.push({
-          href: clazz.$$meta.permalink,
-          verb: 'DELETE'
-        });
+    if(!doNotAdaptSchoolDependencies) {
+      const classesAtSameLocation = await classUtils.getClassesAtCampus(location);
+      ret.classes = classesAtSameLocation;
+      for(let clazz of classesAtSameLocation) {
+        if(batch) {
+          batch.push({
+            href: clazz.$$meta.permalink,
+            verb: 'DELETE'
+          });
+        }
+        await manageDatesForClass(clazz, batch);
       }
-      await manageDatesForClass(clazz, batch);
     }
     return ret;
   };
@@ -433,7 +443,7 @@ module.exports = function (api, dateUtils) {
     for(let classEpd of classEpds) {
       let changed = dateUtils.adaptPeriod(epd, options, classEpd);
       if(changed) {
-        ret.classes.push(classEpd);
+        ret.push(classEpd);
         if(batch) {
           batch.push({
             href: classEpd.$$meta.permalink,

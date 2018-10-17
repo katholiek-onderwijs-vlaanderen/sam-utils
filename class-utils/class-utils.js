@@ -15,7 +15,7 @@ module.exports = function (api) {
         organisationalUnit: classes.map(c => c.from.href).join(','),
         physicalLocation: campus.physicalLocation.href,
         expand: 'results.organisationalUnit'
-      }, {logging: 'debug'});
+      }, {inBatch: '/organisationalunits/batch', logging: 'debug'});
   };
 
   const getClassEpdsForSameAg = async (epd) => {
@@ -27,7 +27,7 @@ module.exports = function (api) {
       organisationalUnit: classes.map(c => c.from.href).join(','),
       ag: epd.ag.href,
       expand: 'results.organisationalUnit'
-    }, {logging: 'debug'});
+    }, {inBatch: '/educationalprogrammedetails/batch', logging: 'debug'});
   };
 
   return {
