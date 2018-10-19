@@ -396,11 +396,11 @@ module.exports = function (api, dateUtils) {
     const oldEpdEndDate = epd.endDate;
     let dirty = false;
     //enlarge period
-    if(dateUtils.isBefore(epdLoc.startDate, epd)) {
+    if(dateUtils.isBefore(epdLoc.startDate, epd.startDate)) {
       epd.startDate = epdLoc.startDate;
       dirty = true;
     }
-    if(dateUtils.isAfter(epdLoc.endDate, epd)) {
+    if(dateUtils.isAfter(epdLoc.endDate, epd.startDate)) {
       epd.endDate = epdLoc.endDate;
       dirty = true;
     }
