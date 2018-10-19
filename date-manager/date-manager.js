@@ -260,20 +260,31 @@ module.exports = function (api, dateUtils) {
 
       const classesAtSameLocation = await classUtils.getClassLocationsAtCampus(location);
       ret.classes = [];
+      const errors = [];
       for(let classLocation of classesAtSameLocation) {
-        let changed = dateUtils.adaptPeriod(location, Object.assign({intermediateStrategy: 'FORCE'}, options), classLocation);
-        if(changed) {
-          ret.classes.push(classLocation);
-          if(batch) {
-            batch.push({
-              href: classLocation.$$meta.permalink,
-              verb: 'PUT',
-              body: classLocation
-            });
+        try {
+          let changed = dateUtils.adaptPeriod(location, Object.assign({intermediateStrategy: 'FORCE'}, options), classLocation);
+          if(changed) {
+            ret.classes.push(classLocation);
+            if(batch) {
+              batch.push({
+                href: classLocation.$$meta.permalink,
+                verb: 'PUT',
+                body: classLocation
+              });
+            }
+          }
+        } catch(error) {
+          if(error instanceof dateUtils.DateError) {
+            errors.push(error);
+          } else {
+            throw error;
           }
         }
       }
-
+    if(errors.length > 0) {
+      throw new dateUtils.DateError('There are some class locations that can not be adapted', errors);
+    }
     return ret;
   };
   const manageDeletesForSchoolLocation = async function(location, batch, doNotAdaptSchoolDependencies) {
@@ -440,18 +451,30 @@ module.exports = function (api, dateUtils) {
     };
     const classEpds = await classUtils.getClassEpdsForSameAg(epd);
     const ret = [];
+    const errors = [];
     for(let classEpd of classEpds) {
-      let changed = dateUtils.adaptPeriod(epd, options, classEpd);
-      if(changed) {
-        ret.push(classEpd);
-        if(batch) {
-          batch.push({
-            href: classEpd.$$meta.permalink,
-            verb: 'PUT',
-            body: classEpd
-          });
+      try {
+        let changed = dateUtils.adaptPeriod(epd, options, classEpd);
+        if(changed) {
+          ret.push(classEpd);
+          if(batch) {
+            batch.push({
+              href: classEpd.$$meta.permalink,
+              verb: 'PUT',
+              body: classEpd
+            });
+          }
+        }
+      } catch(error) {
+        if(error instanceof dateUtils.DateError) {
+          errors.push(error);
+        } else {
+          throw error;
         }
       }
+    }
+    if(errors.length > 0) {
+      throw new dateUtils.DateError('There are some educational programme details that can not be adapted', errors);
     }
     return ret;
   };
