@@ -10,7 +10,9 @@
   ],
   "author": "matthiassnellings",
   "license": "private",
-  "dependencies": {},
+  "dependencies": {
+    "deepcopy": "^1.0.0"
+  },
   "devDependencies": {
     "eslint": "4.13.1"
   },

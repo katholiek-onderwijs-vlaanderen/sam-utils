@@ -1,3 +1,5 @@
+const deepcopy = require('deepcopy/index.js');
+
 module.exports = function (api, dateUtils) {
   const classUtils = require('../class-utils')(api);
 
@@ -143,7 +145,20 @@ module.exports = function (api, dateUtils) {
         ret.classes = [];
         for(let childRel of ret.childRels) {
           ret.classes.push(childRel.from.$$expanded);
-          await manageDatesForClass(childRel.from.$$expanded, batch, oldStartDate, oldEndDate);
+          try {
+            await manageDatesForClass(childRel.from.$$expanded, batch, oldStartDate, oldEndDate);
+          } catch(err) {
+            if(err instanceof dateUtils.DateError) {
+              err.body.forEach(e => e.aboutClass = true);
+              if(!error) {
+                error = err;
+              } else {
+                error.body = error.body.concat(err.body);
+              }
+            } else {
+              throw error;
+            }
+          }
         }
       }
     }
@@ -236,6 +251,7 @@ module.exports = function (api, dateUtils) {
         parameters: {
           'educationalProgrammeDetail.organisationalUnit': location.organisationalUnit.href
         },
+        filter: epdLoc => dateUtils.isOverlapping(epdLoc, location),
         alias: 'epdLocations'
       });
     }
@@ -276,6 +292,7 @@ module.exports = function (api, dateUtils) {
           }
         } catch(error) {
           if(error instanceof dateUtils.DateError) {
+            error.body.forEach(e => e.aboutClass = true);
             errors.push(error);
           } else {
             throw error;
@@ -391,7 +408,7 @@ module.exports = function (api, dateUtils) {
     if(epdLoc.startDate === oldStartDate && epdLoc.endDate === oldEndDate) {
       return;
     }
-    const epd = epdLoc.educationalProgrammeDetail.$$expanded ? epdLoc.educationalProgrammeDetail.$$expanded : await api.get(epdLoc.educationalProgrammeDetail.href);
+    const epd = epdLoc.educationalProgrammeDetail.$$expanded ? deepcopy(epdLoc.educationalProgrammeDetail.$$expanded) : await api.get(epdLoc.educationalProgrammeDetail.href);
     const oldEpdStartDate = epd.startDate;
     const oldEpdEndDate = epd.endDate;
     let dirty = false;
@@ -467,6 +484,7 @@ module.exports = function (api, dateUtils) {
         }
       } catch(error) {
         if(error instanceof dateUtils.DateError) {
+          error.body.forEach(e => e.aboutClass = true);
           errors.push(error);
         } else {
           throw error;
