@@ -292,7 +292,6 @@ module.exports = function (api, dateUtils) {
           }
         } catch(error) {
           if(error instanceof dateUtils.DateError) {
-            error.body.forEach(e => e.aboutClass = true);
             errors.push(error);
           } else {
             throw error;
@@ -417,7 +416,7 @@ module.exports = function (api, dateUtils) {
       epd.startDate = epdLoc.startDate;
       dirty = true;
     }
-    if(dateUtils.isAfter(epdLoc.endDate, epd.startDate)) {
+    if(dateUtils.isAfter(epdLoc.endDate, epd.endDate)) {
       epd.endDate = epdLoc.endDate;
       dirty = true;
     }
@@ -426,7 +425,7 @@ module.exports = function (api, dateUtils) {
       const allEpdLocs = await api.getAll('/educationalprogrammedetails/locations', {educationalProgrammeDetail: epdLoc.educationalProgrammeDetail.href});
       const allOtherEpdLocs = allEpdLocs.filter(x => x.key !== epdLoc.key);
       const minStart = allOtherEpdLocs.reduce((acc, val) => dateUtils.isBefore(val.startDate, acc) ? val.startDate : acc, epdLoc.startDate);
-      const maxEnd = allOtherEpdLocs.reduce((acc, val) => dateUtils.isAfter(val.endDate, acc) ? val.startDate : acc, epdLoc.endDate);
+      const maxEnd = allOtherEpdLocs.reduce((acc, val) => dateUtils.isAfter(val.endDate, acc) ? val.endDate : acc, epdLoc.endDate);
       if(minStart !== epd.startDate || maxEnd !== epd.endDate) {
         epd.startDate = minStart;
         epd.endDate = maxEnd;
@@ -484,7 +483,6 @@ module.exports = function (api, dateUtils) {
         }
       } catch(error) {
         if(error instanceof dateUtils.DateError) {
-          error.body.forEach(e => e.aboutClass = true);
           errors.push(error);
         } else {
           throw error;
