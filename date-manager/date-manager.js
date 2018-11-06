@@ -322,7 +322,7 @@ module.exports = function (api, dateUtils) {
             verb: 'DELETE'
           });
         }
-        await manageDatesForClass(clazz, batch);
+        await manageDeletesForClass(clazz, batch);
       }
     }
     return ret;
