@@ -1,7 +1,7 @@
 const deepcopy = require('deepcopy/index.js');
 
 module.exports = function (api, dateUtils) {
-  const classUtils = require('../class-utils')(api);
+  const classUtils = require('../class-utils')(api, dateUtils);
 
   const getOptionsForGoverningInstitution = function(governingInstitution, batch, oldStartDate, oldEndDate) {
     const options = {
@@ -272,7 +272,6 @@ module.exports = function (api, dateUtils) {
       for(let epdLoc of ret.epdLocations) {
         await manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds);
       }
-    }
 
       const classesAtSameLocation = await classUtils.getClassLocationsAtCampus(location);
       ret.classes = [];
@@ -298,9 +297,11 @@ module.exports = function (api, dateUtils) {
           }
         }
       }
-    if(errors.length > 0) {
-      throw new dateUtils.DateError('There are some class locations that can not be adapted', errors);
+      if(errors.length > 0) {
+        throw new dateUtils.DateError('There are some class locations that can not be adapted', errors);
+      }
     }
+
     return ret;
   };
   const manageDeletesForSchoolLocation = async function(location, batch, doNotAdaptSchoolDependencies) {
