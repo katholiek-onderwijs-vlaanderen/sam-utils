@@ -269,13 +269,28 @@ module.exports = function (api, dateUtils) {
     const options = getOptionsForSchoolLocation(location, batch, oldStartDate, oldEndDate);
     const ret = await dateUtils.manageDateChanges(location, options, api);
     if(ret) {
+      let mainError = null;
       for(let epdLoc of ret.epdLocations) {
-        await manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds);
+        try {
+          await manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds);
+        } catch(error) {
+          if(error instanceof dateUtils.DateError) {
+            if(!mainError) {
+              mainError = error;
+            } else {
+              mainError.body = [...mainError.body, ...error.body];
+            }
+          } else {
+            throw error;
+          }
+        }
       }
-
+      if(mainError) {
+        throw(mainError);
+      }
       const classesAtSameLocation = await classUtils.getClassLocationsAtCampus(location);
-      ret.classes = [];
       const errors = [];
+      ret.classes = [];
       for(let classLocation of classesAtSameLocation) {
         try {
           let changed = dateUtils.adaptPeriod(location, Object.assign({intermediateStrategy: 'FORCE'}, options), classLocation);
@@ -347,8 +362,20 @@ module.exports = function (api, dateUtils) {
     const options = getOptionsForEducationalProgrammeDetail(epd, batch, oldStartDate, oldEndDate, forceEnlargeLocatons);
     const ret = await dateUtils.manageDateChanges(epd, options, api);
     if(ret) {
+      const errors = [];
       for(let epdLoc of ret.epdLocations) {
-        await manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate);
+        try {
+          await manageDatesForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate);
+        } catch(error) {
+          if(error instanceof dateUtils.DateError) {
+            errors.push(error);
+          } else {
+            throw error;
+          }
+        }
+      }
+      if(errors.length > 0) {
+        throw new dateUtils.DateError('There are some class locations that can not be adapted', errors);
       }
     }
     return ret;
