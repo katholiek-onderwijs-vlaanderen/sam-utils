@@ -42,6 +42,32 @@ module.exports = function (api, dateUtils) {
     return dateUtils.manageDeletes(governingInstitution, options, api);
   };
 
+  const getOptionsForCluster = function(batch, oldStartDate, oldEndDate) {
+    const options =[{
+        href: '/organisationalunits/relations',
+        parameters: {type: 'IS_PART_OF'},
+        property: 'from',
+        alias: 'parentRels'
+      }, {
+        href: '/organisationalunits/relations',
+        parameters: {
+          type: 'IS_PART_OF'
+        },
+        property: 'to',
+        intermediateStrategy: 'FORCE',
+        subResources: ['from'],
+        alias: 'childRels'
+      }];
+    return options;
+  };
+  const manageDatesForCluster = async function(cluster, batch, oldStartDate, oldEndDate) {
+    await dateUtils.manageDateChanges(cluster, getOptionsForClass(batch, oldEndDate, oldEndDate), api);
+  };
+  const manageDeletesForCluster = async function(cluster, batch) {
+    await dateUtils.manageDateChanges(cluster, getOptionsForClass(batch), api);
+  };
+
+
   const getOptionsForClass = function(batch, oldStartDate, oldEndDate) {
     const options = {
       oldStartDate: oldStartDate,
