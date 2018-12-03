@@ -575,6 +575,8 @@ module.exports = function (api, dateUtils) {
     manageDeletesForEducationalProgrammeDetail: manageDeletesForEducationalProgrammeDetail,
     manageDeletesForEducationalProgrammeDetailLocation: manageDeletesForEducationalProgrammeDetailLocation,
     adaptEducationProgrammeDetailToAllLocations: adaptEducationProgrammeDetailToAllLocations,
-    deleteEducationProgrammeDetailIfLastLocation: deleteEducationProgrammeDetailIfLastLocation
+    deleteEducationProgrammeDetailIfLastLocation: deleteEducationProgrammeDetailIfLastLocation,
+    manageDatesForCluster: manageDatesForCluster,
+    manageDeletesForCluster: manageDeletesForCluster
   };
 };
