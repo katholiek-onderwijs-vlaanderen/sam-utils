@@ -131,7 +131,6 @@ module.exports = function (api, dateUtils) {
         },
         property: 'to',
         intermediateStrategy: 'FORCE',
-        subResources: ['from'],
         alias: 'childRels'
       }]
     };
