@@ -43,7 +43,13 @@ module.exports = function (api, dateUtils) {
   };
 
   const getOptionsForCluster = function(batch, oldStartDate, oldEndDate) {
-    const options =[{
+    const options = {
+      oldStartDate: oldStartDate,
+      oldEndDate: oldEndDate,
+      intermediateStrategy: 'ERROR',
+      batch: batch,
+      properties: ['names'],
+      references: [{
         href: '/organisationalunits/relations',
         parameters: {type: 'IS_PART_OF'},
         property: 'from',
@@ -57,14 +63,15 @@ module.exports = function (api, dateUtils) {
         intermediateStrategy: 'FORCE',
         subResources: ['from'],
         alias: 'childRels'
-      }];
+      }]
+    };
     return options;
   };
   const manageDatesForCluster = async function(cluster, batch, oldStartDate, oldEndDate) {
-    await dateUtils.manageDateChanges(cluster, getOptionsForClass(batch, oldEndDate, oldEndDate), api);
+    await dateUtils.manageDateChanges(cluster, getOptionsForCluster(batch, oldStartDate, oldEndDate), api);
   };
   const manageDeletesForCluster = async function(cluster, batch) {
-    await dateUtils.manageDateChanges(cluster, getOptionsForClass(batch), api);
+    await dateUtils.manageDateChanges(cluster, getOptionsForCluster(batch), api);
   };
 
 
