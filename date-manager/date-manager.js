@@ -51,12 +51,16 @@ module.exports = function (api, dateUtils) {
       properties: ['names'],
       references: [{
         href: '/organisationalunits/relations',
+        parameters: {type: 'IS_PART_OF'},
+        property: 'from',
+        alias: 'parentRels'
+      }, {
+        href: '/organisationalunits/relations',
         parameters: {
           type: 'IS_PART_OF'
         },
         property: 'to',
         intermediateStrategy: 'FORCE',
-        subResources: ['from'],
         alias: 'childRels'
       }]
     };
