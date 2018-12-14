@@ -9,6 +9,7 @@ const OKAN = '/commons/agsoorten/76fae745-2a07-11e5-be0a-00ffa0598608';
 const HBO = '/commons/agsoorten/76fae629-2a07-11e5-be0a-00ffa0598608';
 const MODULAIR = '/commons/agsoorten/3950a39a-2cc9-11e6-b392-005056872df5';
 const OBSERVATIEJAAR = '/commons/buoopleidingen/cfadd072-77ef-11e5-a3ab-005056872df5';
+const POAH = '/commons/buosoorten/cfa2d2bc-77ef-11e5-a3ab-005056872df5';
 
 const sortEducationProgramme = function(epds, options = {}) {
   epds.sort((a, b) => {
@@ -105,6 +106,15 @@ const sortEducationProgramme = function(epds, options = {}) {
     } else if (a.mainstructure.$$expanded.code === 312) {
       return a.structuuronderdeel.$$expanded.name < b.structuuronderdeel.$$expanded.name ? -1 : 1;
     } else if (a.mainstructure.$$expanded.code === 321) {
+
+      if (a.buoSoort.href === POAH && b.buoSoort.href === POAH) {
+        return a.code - b.code;
+      } else if (a.buoSoort.href === POAH && b.buoSoort.href !== POAH) {
+        return 1;
+      } else if (a.buoSoort.href !== POAH && b.buoSoort.href === POAH) {
+        return -1;
+      }
+
       if(a.buoOpleidingsvorm.href !== b.buoOpleidingsvorm.href) {
         return a.buoOpleidingsvorm.$$expanded.code < b.buoOpleidingsvorm.$$expanded.code ? -1 : 1;
       } else {
