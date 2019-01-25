@@ -57,6 +57,9 @@ const sortEducationProgramme = function(epds, options = {}) {
     if(a.buoOpleiding && !a.buoOpleiding.$$expanded) {
       throw new EpdError('The buoOpleiding of the AG needs to be expanded!', a);
     }
+    if(a.code === b.code) {
+      return epdA.startDate < epdB.startDate ? 1 : -1;
+    }
     if(a.mainstructure.href !== b.mainstructure.href) { // first criteria is always mainstructure
       return a.mainstructure.$$expanded.code - b.mainstructure.$$expanded.code;
     } else if (a.mainstructure.$$expanded.code === 111 || a.mainstructure.$$expanded.code === 211) {
