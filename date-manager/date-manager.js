@@ -11,7 +11,7 @@ module.exports = function (api, dateUtils) {
       batch: batch,
       properties: ['names'],
       references: {
-        href: '/organisationalunits/relations',
+        href: '/sam/organisationalunits/relations',
         parameters: {
           typeIn: 'IS_MEMBER_OF'
         },
@@ -21,12 +21,12 @@ module.exports = function (api, dateUtils) {
     };
     if(!oldStartDate && !oldEndDate) {
       options.references.push({
-        href: '/organisationalunits/externalidentifiers',
+        href: '/sam/organisationalunits/externalidentifiers',
         property: 'organisationalUnit',
         alias: 'externalIdentifiers'
       });
       options.references.push({
-        href: '/organisationalunits/contactdetails',
+        href: '/sam/organisationalunits/contactdetails',
         property: 'organisationalUnit',
         alias: 'contactDetails'
       });
@@ -50,12 +50,12 @@ module.exports = function (api, dateUtils) {
       batch: batch,
       properties: ['names'],
       references: [{
-        href: '/organisationalunits/relations',
+        href: '/sam/organisationalunits/relations',
         parameters: {type: 'IS_PART_OF'},
         property: 'from',
         alias: 'parentRels'
       }, {
-        href: '/organisationalunits/relations',
+        href: '/sam/organisationalunits/relations',
         parameters: {
           type: 'IS_PART_OF'
         },
@@ -82,15 +82,15 @@ module.exports = function (api, dateUtils) {
       batch: batch,
       properties: ['names'],
       references: [{
-        href: '/organisationalunits/locations',
+        href: '/sam/organisationalunits/locations',
         property: 'organisationalUnit',
         alias: 'locations'
       }, {
-        href: '/educationalProgrammeDetails',
+        href: '/sam/educationalProgrammeDetails',
         property: 'organisationalUnit',
         alias: 'epds'
       }, {
-        href: '/organisationalunits/relations',
+        href: '/sam/organisationalunits/relations',
         parameters: {type: 'IS_PART_OF'},
         property: 'from',
         alias: 'parentRels'
@@ -106,25 +106,25 @@ module.exports = function (api, dateUtils) {
       batch: batch,
       properties: ['names'],
       references: [{
-        href: '/organisationalunits/relations',
+        href: '/sam/organisationalunits/relations',
         parameters: {typeIn: 'GOVERNS,PROVIDES_SERVICES_TO'},
         property: 'to',
         alias: 'relations'
       }, {
-        href: '/organisationalunits/locations',
+        href: '/sam/organisationalunits/locations',
         property: 'organisationalUnit',
         alias: 'locations'
       }, {
-        href: '/educationalProgrammeDetails',
+        href: '/sam/educationalProgrammeDetails',
         property: 'organisationalUnit',
         alias: 'epds'
       }, {
-        href: '/organisationalunits/relations',
+        href: '/sam/organisationalunits/relations',
         parameters: {type: 'IS_PART_OF'},
         property: 'from',
         alias: 'parentRels'
       }, {
-        href: '/organisationalunits/relations',
+        href: '/sam/organisationalunits/relations',
         parameters: {
           type: 'IS_PART_OF'
         },
@@ -135,12 +135,12 @@ module.exports = function (api, dateUtils) {
     };
     if(!oldStartDate && !oldEndDate) {
       options.references.push({
-        href: '/organisationalunits/externalidentifiers',
+        href: '/sam/organisationalunits/externalidentifiers',
         property: 'organisationalUnit',
         alias: 'externalIdentifiers'
       });
       options.references.push({
-        href: '/organisationalunits/contactdetails',
+        href: '/sam/organisationalunits/contactdetails',
         property: 'organisationalUnit',
         alias: 'contactDetails'
       });
@@ -227,7 +227,7 @@ module.exports = function (api, dateUtils) {
       batch: batch,
       properties: ['names'],
       references: [{
-        href: '/organisationalunits/relations',
+        href: '/sam/organisationalunits/relations',
         parameters: {
           typeIn: 'GOVERNS'
         },
@@ -246,7 +246,7 @@ module.exports = function (api, dateUtils) {
       batch: batch,
       properties: ['names'],
       references: [{
-        href: '/organisationalunits/relations',
+        href: '/sam/organisationalunits/relations',
         parameters: {
           typeIn: 'GOVERNS'
         },
@@ -277,7 +277,7 @@ module.exports = function (api, dateUtils) {
     }*/
     if(!doNotAdaptSchoolDependencies) {
       options.references.push({
-        href: '/educationalProgrammeDetails/locations',
+        href: '/sam/educationalProgrammeDetails/locations',
         commonReference: 'physicalLocation',
         parameters: {
           'educationalProgrammeDetail.organisationalUnit': location.organisationalUnit.href
@@ -288,7 +288,7 @@ module.exports = function (api, dateUtils) {
     }
     if(!oldStartDate && !oldEndDate) {
       options.references.push({
-        href: '/organisationalunits/locations/externalidentifiers',
+        href: '/sam/organisationalunits/locations/externalidentifiers',
         property: 'location',
         alias: 'externalIdentifiers'
       });
@@ -381,7 +381,7 @@ module.exports = function (api, dateUtils) {
       intermediateStrategy: 'ERROR',
       batch: batch,
       references: {
-        href: '/educationalProgrammeDetails/locations',
+        href: '/sam/educationalProgrammeDetails/locations',
         property: 'educationalProgrammeDetail',
         onlyShortenPeriod: !forceEnlargeLocatons,
         alias: 'epdLocations'
@@ -429,12 +429,12 @@ module.exports = function (api, dateUtils) {
       intermediateStrategy: 'ERROR',
       batch: batch,
       references: [{
-        href: '/educationalprogrammedetails/locations/relations',
+        href: '/sam/educationalprogrammedetails/locations/relations',
         property: 'to',
         alias: 'relationsFrom'
       },
       {
-        href: '/educationalprogrammedetails/locations/relations',
+        href: '/sam/educationalprogrammedetails/locations/relations',
         property: 'from',
         alias: 'relationsTo'
       }]
@@ -445,7 +445,7 @@ module.exports = function (api, dateUtils) {
     const options = getOptionsForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate);
     if(adaptEpds) {
       /*options.references.push({
-        href: '/educationalprogrammedetails',
+        href: '/sam/educationalprogrammedetails',
         property: 'educationalProgrammeDetail',
         intermediateStrategy: 'FORCE',
         onlyEnlargePeriod: true
@@ -481,7 +481,7 @@ module.exports = function (api, dateUtils) {
     }
     //shorten period;
     if(dateUtils.isAfter(epdLoc.startDate, oldStartDate) || dateUtils.isBefore(epdLoc.endDate, oldEndDate)) {
-      const allEpdLocs = await api.getAll('/educationalprogrammedetails/locations', {educationalProgrammeDetail: epdLoc.educationalProgrammeDetail.href});
+      const allEpdLocs = await api.getAll('/sam/educationalprogrammedetails/locations', {educationalProgrammeDetail: epdLoc.educationalProgrammeDetail.href});
       const allOtherEpdLocs = allEpdLocs.filter(x => x.key !== epdLoc.key);
       const minStart = allOtherEpdLocs.reduce((acc, val) => dateUtils.isBefore(val.startDate, acc) ? val.startDate : acc, epdLoc.startDate);
       const maxEnd = allOtherEpdLocs.reduce((acc, val) => dateUtils.isAfter(val.endDate, acc) ? val.endDate : acc, epdLoc.endDate);
@@ -505,7 +505,7 @@ module.exports = function (api, dateUtils) {
   };
 
   const deleteEducationProgrammeDetailIfLastLocation = async (epdLoc, batch) => {
-    const allEpdLocs = await api.getAll('/educationalprogrammedetails/locations', {educationalProgrammeDetail: epdLoc.educationalProgrammeDetail.href});
+    const allEpdLocs = await api.getAll('/sam/educationalprogrammedetails/locations', {educationalProgrammeDetail: epdLoc.educationalProgrammeDetail.href});
     const allOtherEpdLocs = allEpdLocs.filter(x => x.key !== epdLoc.key);
     if(allOtherEpdLocs.length === 0) {
       batch.push({
