@@ -198,7 +198,31 @@ const sortEducationProgramme = function(epds, options = {}) {
   });
 };
 
+const getRelatedSchoolEntities = async function(schoolHref, samApi) {
+  const permalinks = Array.isArray(schoolHref) ? schoolHref.join(',') : schoolHref;
+  let epds = await samApi.getAll('/sam/educationalprogrammedetails', {organisationalUnit: permalinks, expand: 'NONE'});
+  let epdLocs = await samApi.getAll('/sam/educationalprogrammedetails/locations', {educationalProgrammeDetail: epds.map(epd => epd.href), expand: 'NONE'}, {inBatch: '/sam/educationalprogrammedetails/batch'});
+  // bug in Sam Api that goes wrong when passing on multiple organisationalunits to this parameter
+  // let epdLocs = await samApi.getAll('/sam/educationalprogrammedetails/locations', {'educationalProgrammeDetail.organisationalUnit': permalinks, expand: 'NONE'}, {logging: 'get'});
+  let epdLocRels = await samApi.getAll('/sam/educationalprogrammedetails/locations/relations', {to: epdLocs.map(epdLoc => epdLoc.href), expand: 'results.from.educationalProgrammeDetail'}, {inBatch: '/sam/educationalprogrammedetails/batch'});
+  let ret = new Set(epdLocRels.map(rel => rel.from.$$expanded.educationalProgrammeDetail.$$expanded.organisationalUnit.href));
+  return [...ret];
+};
+
+const getRelatedSchools = async function(schoolEntityHref, samApi) {
+  const permalinks = Array.isArray(schoolEntityHref) ? schoolEntityHref.join(',') : schoolEntityHref;
+  let epds = await samApi.getAll('/sam/educationalprogrammedetails', {organisationalUnit: permalinks, expand: 'NONE'});
+  let epdLocs = await samApi.getAll('/sam/educationalprogrammedetails/locations', {educationalProgrammeDetail: epds.map(epd => epd.href), expand: 'NONE'}, {inBatch: '/sam/educationalprogrammedetails/batch'});
+  // bug in Sam Api that goes wrong when passing on multiple organisationalunits to this parameter
+  // let epdLocs = await samApi.getAll('/sam/educationalprogrammedetails/locations', {'educationalProgrammeDetail.organisationalUnit': permalinks, expand: 'NONE'}, {logging: 'get'});
+  let epdLocRels = await samApi.getAll('/sam/educationalprogrammedetails/locations/relations', {from: epdLocs.map(epdLoc => epdLoc.href), expand: 'results.to.educationalProgrammeDetail'}, {inBatch: '/sam/educationalprogrammedetails/batch'});
+  let ret = new Set(epdLocRels.map(rel => rel.from.$$expanded.educationalProgrammeDetail.$$expanded.organisationalUnit.href));
+  return [...ret];
+};
+
 module.exports = {
   sortEducationProgramme: sortEducationProgramme,
+  getRelatedSchoolEntities: getRelatedSchoolEntities,
+  getRelatedSchools: getRelatedSchools,
   EpdError: EpdError
 };
