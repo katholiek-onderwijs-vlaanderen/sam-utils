@@ -126,7 +126,8 @@ module.exports = function (api, dateUtils) {
       }, {
         href: '/sam/organisationalunits/relations',
         parameters: {
-          type: 'IS_PART_OF'
+          type: 'IS_PART_OF',
+          expand: 'results.from'
         },
         property: 'to',
         intermediateStrategy: 'FORCE',
@@ -175,6 +176,12 @@ module.exports = function (api, dateUtils) {
       if(!isClass) {
         ret.classes = [];
         for(let childRel of ret.childRels) {
+          childRel.from.$$expanded.startDate = childRel.startDate;
+          batch.push({
+            href: childRel.from.href,
+            verb: 'PUT',
+            body: childRel.from.$$expanded
+          });
           ret.classes.push(childRel.from.$$expanded);
           try {
             await manageDatesForClass(childRel.from.$$expanded, batch, oldStartDate, oldEndDate);
@@ -406,7 +413,7 @@ module.exports = function (api, dateUtils) {
         }
       }
       if(errors.length > 0) {
-        throw new dateUtils.DateError('There are some class locations that can not be adapted', errors);
+        throw new dateUtils.DateError('There are some epd locations that can not be adapted', errors);
       }
     }
     return ret;
