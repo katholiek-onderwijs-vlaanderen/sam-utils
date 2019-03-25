@@ -1,0 +1,17 @@
+.idea
+*~
+node_modules
+.env
+test.env
+.log
+bin/
+build/
+npm-debug.log
+npm.local
+dump.rdb
+.idea
+.DS_Store
+.project
+web/js/config/vsko-oauth-configuration.json
+.vscode/settings.json
+.vscode/launch.json
