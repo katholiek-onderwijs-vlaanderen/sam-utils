@@ -177,6 +177,7 @@ module.exports = function (api, dateUtils) {
         ret.classes = [];
         for(let childRel of ret.childRels) {
           childRel.from.$$expanded.startDate = childRel.startDate;
+          childRel.from.$$expanded.endDate = childRel.endDate;
           batch.push({
             href: childRel.from.href,
             verb: 'PUT',
