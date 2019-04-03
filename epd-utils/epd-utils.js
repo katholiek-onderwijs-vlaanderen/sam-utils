@@ -5,11 +5,11 @@ class EpdError {
   }
 }
 
-const OKAN = '/sam/organisational/agsoorten/76fae745-2a07-11e5-be0a-00ffa0598608';
-const HBO = '/sam/organisational/agsoorten/76fae629-2a07-11e5-be0a-00ffa0598608';
-const MODULAIR = '/sam/organisational/agsoorten/3950a39a-2cc9-11e6-b392-005056872df5';
-const OBSERVATIEJAAR = '/sam/organisational/buoopleidingen/cfadd072-77ef-11e5-a3ab-005056872df5';
-const POAH = '/sam/organisational/buosoorten/cfa2d2bc-77ef-11e5-a3ab-005056872df5';
+const OKAN = '/sam/commons/agsoorten/76fae745-2a07-11e5-be0a-00ffa0598608';
+const HBO = '/sam/commons/agsoorten/76fae629-2a07-11e5-be0a-00ffa0598608';
+const MODULAIR = '/sam/commons/agsoorten/3950a39a-2cc9-11e6-b392-005056872df5';
+const OBSERVATIEJAAR = '/sam/commons/buoopleidingen/cfadd072-77ef-11e5-a3ab-005056872df5';
+const POAH = '/sam/commons/buosoorten/cfa2d2bc-77ef-11e5-a3ab-005056872df5';
 
 const sortEducationProgramme = function(epds, options = {}) {
   epds.sort((a, b) => {
