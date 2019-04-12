@@ -66,11 +66,12 @@ module.exports = function (api, dateUtils) {
     };
     return options;
   };
+  
   const manageDatesForCluster = async function(cluster, batch, oldStartDate, oldEndDate) {
-    await dateUtils.manageDateChanges(cluster, getOptionsForCluster(batch, oldStartDate, oldEndDate), api);
+    return dateUtils.manageDateChanges(cluster, getOptionsForCluster(batch, oldStartDate, oldEndDate), api);
   };
   const manageDeletesForCluster = async function(cluster, batch) {
-    await dateUtils.manageDateChanges(cluster, getOptionsForCluster(batch), api);
+    return dateUtils.manageDeletes(cluster, getOptionsForCluster(batch), api);
   };
 
 
