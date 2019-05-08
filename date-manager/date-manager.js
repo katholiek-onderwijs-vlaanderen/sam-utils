@@ -66,7 +66,7 @@ module.exports = function (api, dateUtils) {
     };
     return options;
   };
-  
+
   const manageDatesForCluster = async function(cluster, batch, oldStartDate, oldEndDate) {
     return dateUtils.manageDateChanges(cluster, getOptionsForCluster(batch, oldStartDate, oldEndDate), api);
   };
@@ -432,16 +432,25 @@ module.exports = function (api, dateUtils) {
   };
 
   const getOptionsForEducationalProgrammeDetailLocation = function(epdLoc, batch, oldStartDate, oldEndDate) {
+    const toReference = {
+      href: '/sam/educationalprogrammedetails/locations/relations',
+      property: 'to',
+      alias: 'relationsFrom',
+      intermediateStrategy: 'FORCE'
+    };
+    if(oldStartDate && dateUtils.isAfter(epdLoc.endDate, oldEndDate)) {
+      toReference.parameters = {
+        expand: 'results.from'
+      };
+      toReference.filter = (elem) => dateUtils.isAfterOrEqual(elem.from.$$expanded.endDate, epdLoc.endDate);
+    }
+
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
       intermediateStrategy: 'ERROR',
       batch: batch,
-      references: [{
-        href: '/sam/educationalprogrammedetails/locations/relations',
-        property: 'to',
-        alias: 'relationsFrom'
-      },
+      references: [toReference,
       {
         href: '/sam/educationalprogrammedetails/locations/relations',
         property: 'from',
