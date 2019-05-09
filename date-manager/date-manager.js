@@ -10,14 +10,22 @@ module.exports = function (api, dateUtils) {
       intermediateStrategy: 'ERROR',
       batch: batch,
       properties: ['names'],
-      references: {
+      references: [{
         href: '/sam/organisationalunits/relations',
         parameters: {
           typeIn: 'IS_MEMBER_OF'
         },
         property: 'from',
         alias: 'relations'
-      }
+      }, {
+        href: '/sam/organisationalunits/relations',
+        parameters: {
+          typeIn: 'GOVERNS',
+          'to.type': 'SCHOOLENTITY'
+        },
+        property: 'from',
+        alias: 'relations'
+      }]
     };
     if(!oldStartDate && !oldEndDate) {
       options.references.push({
