@@ -210,6 +210,10 @@ const getRelatedSchoolEntities = async function(schoolHref, samApi, referenceDat
     expand: 'results.educationalProgrammeDetail'
   }), {logging: 'get'});
 
+  if (epdLocs.length === 0) {
+    return [];
+  }
+
   let epdLocRels = await samApi.getAll('/sam/educationalprogrammedetails/locations/relations', Object.assign({}, datePeriod, {
     to: epdLocs.map(epdLoc => epdLoc.$$meta.permalink), 
     expand: 'results.from.educationalProgrammeDetail'
@@ -229,6 +233,10 @@ const getRelatedSchools = async function(schoolEntityHref, samApi, referenceDate
     'educationalProgrammeDetail.organisationalUnit': permalinks, 
     expand: 'results.educationalProgrammeDetail', 
   }), {logging: 'get'});
+
+  if (epdLocs.length === 0) {
+    return [];
+  }
   
   let epdLocRels = await samApi.getAll('/sam/educationalprogrammedetails/locations/relations', Object.assign({}, datePeriod, {
     from: epdLocs.map(epdLoc => epdLoc.$$meta.permalink), 
