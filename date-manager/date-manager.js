@@ -309,6 +309,15 @@ module.exports = function (api, dateUtils) {
         property: 'location',
         alias: 'externalIdentifiers'
       });
+
+      options.references.push({
+        href: '/sam/organisationalunits/contactdetails',
+        commonReference: 'physicalLocation',
+        parameters: {
+          organisationalUnit: location.organisationalUnit.href
+        },
+        alias: 'contactdetails'
+      });
     }
     return options;
   };
