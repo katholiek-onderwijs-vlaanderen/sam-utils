@@ -228,6 +228,10 @@ module.exports = function (api, dateUtils) {
         ret.classes = [];
         for(let childRel of ret.childRels) {
           ret.classes.push(childRel.from.$$expanded);
+          batch.push({
+            href: childRel.from.href,
+            verb: 'DELETE'
+          });
           await manageDeletesForClass(childRel.from.$$expanded, batch);
         }
       }
