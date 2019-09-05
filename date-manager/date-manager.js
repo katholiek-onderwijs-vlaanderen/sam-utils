@@ -254,6 +254,10 @@ module.exports = function (api, dateUtils) {
         },
         property: 'to',
         alias: 'relations'
+      }, {
+        href: '/sam/organisationalunits/locations',
+        property: 'organisationalUnit',
+        alias: 'locations'
       }]
     };
     return dateUtils.manageDateChanges(boarding, options, api);
