@@ -307,7 +307,7 @@ module.exports = function (api, dateUtils) {
         parameters: {
           'educationalProgrammeDetail.organisationalUnit': location.organisationalUnit.href
         },
-        filter: epdLoc => dateUtils.isOverlapping(epdLoc, location),
+        // filter: epdLoc => dateUtils.isOverlapping(epdLoc, location), was added in https://github.com/katholiek-onderwijs-vlaanderen/sam-utils/commit/eac5d8f55be311f50c456276e01b1c3e66a861b9 but this leaves floating future epds
         alias: 'epdLocations'
       });
     }
