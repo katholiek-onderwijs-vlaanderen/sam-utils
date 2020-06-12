@@ -119,6 +119,11 @@ module.exports = function (api, dateUtils) {
         parameters: {typeIn: 'GOVERNS,PROVIDES_SERVICES_TO'},
         property: 'to',
         alias: 'relations'
+      },{
+        href: '/sam/organisationalunits/relations',
+        parameters: {typeIn: 'IS_MEMBER_OF'},
+        property: 'from',
+        alias: 'scRelations'
       }, {
         href: '/sam/organisationalunits/locations',
         property: 'organisationalUnit',
@@ -280,6 +285,25 @@ module.exports = function (api, dateUtils) {
       }]
     };
     return dateUtils.manageDateChanges(clb, options, api);
+  };
+  
+  const manageDatesForSchoolCommunity = function(sc, batch, oldStartDate, oldEndDate) {
+    const options = {
+      oldStartDate: oldStartDate,
+      oldEndDate: oldEndDate,
+      intermediateStrategy: 'ERROR',
+      batch: batch,
+      properties: ['names'],
+      references: [{
+        href: '/sam/organisationalunits/relations',
+        parameters: {
+          typeIn: 'GOVERNS'
+        },
+        property: 'to',
+        alias: 'relations'
+      }]
+    };
+    return dateUtils.manageDateChanges(sc, options, api);
   };
 
   const getOptionsForSchoolLocation = function(location, batch, oldStartDate, oldEndDate, doNotAdaptSchoolDependencies) {
@@ -617,6 +641,7 @@ module.exports = function (api, dateUtils) {
     manageDatesForEducationalProgrammeDetailLocation: manageDatesForEducationalProgrammeDetailLocation,
     manageDatesForBoarding: manageDatesForBoarding,
     manageDatesForClb: manageDatesForClb,
+    manageDatesForSchoolCommunity: manageDatesForSchoolCommunity,
     manageDeletesForGoverningInstitution: manageDeletesForGoverningInstitution,
     manageDeletesForSchool: manageDeletesForSchool,
     manageDeletesForSchoolLocation: manageDeletesForSchoolLocation,
