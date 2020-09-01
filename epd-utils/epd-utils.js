@@ -13,9 +13,12 @@ const POAH = '/sam/commons/buosoorten/cfa2d2bc-77ef-11e5-a3ab-005056872df5';
 
 const leerwegSort = function (a, b) {
 
-  if (!a.leerweg && !b.leerweg) {
+  /*if (!a.leerweg && !b.leerweg) {
+    if (a.stelselSo && b.stelselSo && a.stelselSo.$$expanded.code !== b.stelselSo.$$expanded.code) {
+      return a.stelselSo.$$expanded.code < b.stelselSo.$$expanded.code ? -1 : 1;
+    }
     return 0;
-  }
+  }*/
 
   if (a.leerweg && !b.leerweg) {
     return 1;
@@ -25,9 +28,9 @@ const leerwegSort = function (a, b) {
     return -1;
   }
 
-  if (a.leerweg.href !== b.leerweg.href) {
+  if (a.leerweg && b.leerweg && a.leerweg.href !== b.leerweg.href) {
     return a.leerweg.$$expanded.code < b.leerweg.$$expanded.code ? -1 : 1;
-  } else if (a.stelselSo.$$expanded.code !== b.stelselSo.$$expanded.code) {
+  } else if (a.stelselSo && b.stelselSo && a.stelselSo.$$expanded.code !== b.stelselSo.$$expanded.code) {
     return a.stelselSo.$$expanded.code < b.stelselSo.$$expanded.code ? -1 : 1;
   } else {
     return 0;
@@ -148,7 +151,7 @@ const sortEducationProgramme = function(epds, options = {}) {
       if (leerwegOrdering !== 0) {
         return leerwegOrdering;
       }
-      return a.code < b.code ? -1 : 1;
+      return a.name < b.name ? -1 : 1;
       //return a.structuuronderdeel.$$expanded.name < b.structuuronderdeel.$$expanded.name ? -1 : 1;
     } else if (a.mainstructure.$$expanded.code === 321) {
       if (a.buoSoort.href === POAH && b.buoSoort.href === POAH) {
