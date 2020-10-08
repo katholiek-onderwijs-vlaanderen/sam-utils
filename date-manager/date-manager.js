@@ -436,7 +436,7 @@ module.exports = function (api, dateUtils) {
     const options = {
       oldStartDate: oldStartDate,
       oldEndDate: oldEndDate,
-      intermediateStrategy: 'ERROR',
+      intermediateStrategy: 'FORCE',
       batch: batch,
       references: {
         href: '/sam/educationalProgrammeDetails/locations',
