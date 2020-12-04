@@ -139,6 +139,16 @@ module.exports = function (api, dateUtils) {
         alias: 'parentRels'
       }, {
         href: '/sam/organisationalunits/relations',
+        parameters: {type: 'CAN_ACT_AS'},
+        property: 'from',
+        alias: 'relatedOfficialSchool'
+      }, {
+        href: '/sam/organisationalunits/relations',
+        parameters: {type: 'CAN_ACT_AS'},
+        property: 'to',
+        alias: 'relatedSchoolEntities'
+      }, {
+        href: '/sam/organisationalunits/relations',
         parameters: {
           type: 'IS_PART_OF',
           expand: 'results.from'
