@@ -18,6 +18,10 @@ module.exports = function (api, dateUtils) {
         property: 'from',
         alias: 'relations'
       }, {
+        href: '/sam/organisationalunits/legalorganisationalforms',
+        property: 'organisationalUnit',
+        alias: 'legalOrganisationalForm'
+      }, {
         href: '/sam/organisationalunits/relations',
         parameters: {
           typeIn: 'GOVERNS',
