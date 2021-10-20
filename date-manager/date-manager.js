@@ -20,10 +20,12 @@ module.exports = function (api, dateUtils) {
       }, {
         href: '/sam/organisationalunits/locations',
         property: 'organisationalUnit',
+        intermediateStrategy: 'FORCE',
         alias: 'locations'
       }, {
         href: '/sam/organisationalunits/legalorganisationalforms',
         property: 'organisationalUnit',
+        intermediateStrategy: 'FORCE',
         alias: 'legalOrganisationalForm'
       }, {
         href: '/sam/organisationalunits/relations',
@@ -322,6 +324,7 @@ module.exports = function (api, dateUtils) {
       }, {
         href: '/sam/organisationalunits/locations',
         property: 'organisationalUnit',
+        intermediateStrategy: 'FORCE',
         alias: 'locations'
       }]
     };
