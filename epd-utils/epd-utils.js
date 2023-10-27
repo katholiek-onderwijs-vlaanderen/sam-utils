@@ -195,6 +195,10 @@ const sortEducationProgramme = function(epds, options = {}) {
             return a.buoOpleiding.$$expanded.name < b.buoOpleiding.$$expanded.name ? -1 : 1;
           } else if(a.buoFase.href !== b.buoFase.href) {
             return a.buoFase.$$expanded.sortOrder - b.buoFase.$$expanded.sortOrder;
+          } else if (a.leerjaar && !b.leerjaar) {
+            return -1;
+          } else if (!a.leerjaar && b.leerjaar) {
+            return 1;
           } else {
             return a.leerjaar.$$expanded.code - b.leerjaar.$$expanded.code;
           }
