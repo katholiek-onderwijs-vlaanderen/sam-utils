@@ -199,13 +199,13 @@ const sortEducationProgramme = function(epds, options = {}) {
             return -1;
           } else if (!a.leerjaar && b.leerjaar) {
             return 1;
-          } else if (!a.leerjaar && !b.leerjaar) {
+          } else if (a.leerjaar && b.leerjaar) {
+            return a.leerjaar.$$expanded.code - b.leerjaar.$$expanded.code;
+          } else {
             console.log('two ags with no leerjaar!')
             console.log(a)
             console.log(b)
             return a.name < b.name ? -1 : 1;
-          } else {
-            return a.leerjaar.$$expanded.code - b.leerjaar.$$expanded.code;
           }
         } else if(a.buoOpleidingsvorm.$$expanded.code === "OV4") {
           /*if(a.soort.href === MODULAIR || b.soort.href === MODULAIR) {
