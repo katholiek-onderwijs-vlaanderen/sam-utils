@@ -199,6 +199,11 @@ const sortEducationProgramme = function(epds, options = {}) {
             return -1;
           } else if (!a.leerjaar && b.leerjaar) {
             return 1;
+          } else if (!a.leerjaar && !b.leerjaar) {
+            console.log('two ags with no leerjaar!')
+            console.log(a)
+            console.log(b)
+            return a.name < b.name ? -1 : 1;
           } else {
             return a.leerjaar.$$expanded.code - b.leerjaar.$$expanded.code;
           }
