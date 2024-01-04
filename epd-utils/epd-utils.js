@@ -361,6 +361,6 @@ module.exports = {
   sortEducationProgramme: sortEducationProgramme,
   getRelatedSchoolEntities: getRelatedSchoolEntities,
   getRelatedSchools: getRelatedSchools,
-  getExpectedEpdsPointingToMainstructures,
+  getCorrespondingRelationsToMainstructures,
   EpdError: EpdError
 };
