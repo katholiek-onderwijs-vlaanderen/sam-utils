@@ -3,6 +3,10 @@ utility functions for applications that use the Samenscholing domain
 ## date-manager
 
 ## epd-utils
+```javascript
+const epdUtils = require('@kathondvla/sam-utils/epd-utils');
+```
+
 * **sortEducationProgramme(epds):** sorts the epds in a functionally logical order the epds need to have their ag property expanded
 * **getCorrespondingRelationsToMainstructures(epdsPointingToAgs, agMsMap):** return the denormalized relations to mainstructures based on the educational programme details pointing to ags. It also needs agMsMap as a map with key an ag permalink and value an object with property mainstructure.href so the function knows for each agHref in an epd to what mainstructure it points.
 
