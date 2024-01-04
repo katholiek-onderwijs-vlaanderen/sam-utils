@@ -11,7 +11,8 @@
   "author": "matthiassnellings",
   "license": "private",
   "dependencies": {
-    "deepcopy": "^1.0.0"
+    "@kathondvla/sri-client": "^3.0.21",
+    "lodash.clonedeep": "^4.5.0"
   },
   "devDependencies": {
     "eslint": "4.13.1"

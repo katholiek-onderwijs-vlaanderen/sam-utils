@@ -1,3 +1,6 @@
+const { isOverlapping, isBefore, isAfter } = require('@kathondvla/sri-client/date-utils');
+const { generateUUID } = require('@kathondvla/sri-client/common-utils');
+
 class EpdError {
   constructor(message, body) {
     this.message = message;
@@ -12,14 +15,6 @@ const OBSERVATIEJAAR = '/sam/commons/buoopleidingen/cfadd072-77ef-11e5-a3ab-0050
 const POAH = '/sam/commons/buosoorten/cfa2d2bc-77ef-11e5-a3ab-005056872df5';
 
 const leerwegSort = function (a, b) {
-
-  /*if (!a.leerweg && !b.leerweg) {
-    if (a.stelselSo && b.stelselSo && a.stelselSo.$$expanded.code !== b.stelselSo.$$expanded.code) {
-      return a.stelselSo.$$expanded.code < b.stelselSo.$$expanded.code ? -1 : 1;
-    }
-    return 0;
-  }*/
-
   if (a.leerweg && !b.leerweg) {
     return 1;
   }
@@ -304,9 +299,68 @@ const getRelatedSchools = async function(schoolEntityHref, samApi, referenceDate
   return [...ret];
 };
 
+/**
+ * calculates the epds pointing to mainstructures completely consistent with the given epds pointing to ags.
+ * An ag references a mainstructure, so this function calculates the denormalized version.
+ * @param {{ key: string, ag: { href: string }, organisationalUnit: { href: string }, startDate: string, endDate: string | null}[]} epdsPointingToAgs list of epds pointing to ags
+ * @param {Record<string, { mainstructure: { href: string }}>} agMsMap map with key permalink referencing ag, value object with mainstructure.href referencing mainstructure
+ * @returns {{ key: string, mainstructureHref, relatedEpdsPointingToAgs: any[], startDate: string, endDate: string | null}[]} list of correlated mainstructers in their corresponding periods
+ */
+const getCorrespondingRelationsToMainstructures = (epdsPointingToAgs, agMsMap) => {
+  let denormalizedMsRelations = [];
+  epdsPointingToAgs.forEach((epd) => {
+    const overlappingMsRelations = denormalizedMsRelations.filter(
+      (msRel) => msRel.mainstructureHref === agMsMap[epd.ag.href].mainstructure.href
+        && (isOverlapping(epd, msRel) || epd.endDate === msRel.startDate || epd.startDate === msRel.endDate)
+    );
+    if (overlappingMsRelations.length > 1) {
+      // two msRels need to be merged because this epds makes the bridge between those two periods
+      const mergedMsRel = {
+        key: generateUUID(),
+        mainstructureHref: agMsMap[epd.ag.href].mainstructure.href,
+        startDate: overlappingMsRelations.reduce(
+          (startDate, msRel) => isBefore(msRel.startDate, startDate) ? msRel.startDate : startDate,
+          epd.startDate
+        ),
+        endDate: overlappingMsRelations.reduce(
+          (endDate, msRel) => isAfter(msRel.endDate, endDate) ? msRel.endDate : endDate,
+          epd.endDate
+        ),
+        relatedEpdsPointingToAgs: overlappingMsRelations.map((rel) => rel.relatedEpdsPointingToAgs).flat()
+      };
+      mergedMsRel.relatedEpdsPointingToAgs.push(epd);
+      denormalizedMsRelations = [
+        ...denormalizedMsRelations.filter((msRel) => !overlappingMsRelations.some((overlappingRel) => overlappingRel.key === msRel.key)),
+        mergedMsRel,
+      ];
+    } else if (overlappingMsRelations.length === 0) {
+      // there is no relation yet with this ms in the overlapping period, so we create a new relation
+        denormalizedMsRelations.push({
+          key: generateUUID(),
+          mainstructureHref: agMsMap[epd.ag.href].mainstructure.href,
+          startDate: epd.startDate,
+          endDate: epd.endDate,
+          relatedEpdsPointingToAgs: [epd]
+      }); 
+    } else {
+      // there is exactly one relation with the mainstructure in the same period so we adapt the period if necessary
+      const existingMsRel = overlappingMsRelations[0];
+      existingMsRel.relatedEpdsPointingToAgs.push(epd);
+      if (isBefore(epd.startDate, existingMsRel.startDate)) {
+        existingMsRel.startDate = epd.startDate;
+      }
+      if (isAfter(epd.endDate, existingMsRel.endDate)) {
+        existingMsRel.endDate = epd.endDate;
+      }
+    }
+  });
+  return denormalizedMsRelations;
+}
+
 module.exports = {
   sortEducationProgramme: sortEducationProgramme,
   getRelatedSchoolEntities: getRelatedSchoolEntities,
   getRelatedSchools: getRelatedSchools,
+  getExpectedEpdsPointingToMainstructures,
   EpdError: EpdError
 };

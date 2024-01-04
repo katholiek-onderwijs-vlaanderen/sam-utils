@@ -1,4 +1,4 @@
-const deepcopy = require('deepcopy/index.js');
+const cloneDeep = require('lodash.clonedeep');
 
 module.exports = function (api, dateUtils) {
   const classUtils = require('../class-utils')(api, dateUtils);
@@ -558,7 +558,7 @@ module.exports = function (api, dateUtils) {
     if(epdLoc.startDate === oldStartDate && epdLoc.endDate === oldEndDate) {
       return;
     }
-    const epd = epdLoc.educationalProgrammeDetail.$$expanded ? deepcopy(epdLoc.educationalProgrammeDetail.$$expanded) : await api.get(epdLoc.educationalProgrammeDetail.href);
+    const epd = epdLoc.educationalProgrammeDetail.$$expanded ? cloneDeep(epdLoc.educationalProgrammeDetail.$$expanded) : await api.get(epdLoc.educationalProgrammeDetail.href);
     const oldEpdStartDate = epd.startDate;
     const oldEpdEndDate = epd.endDate;
     let dirty = false;
