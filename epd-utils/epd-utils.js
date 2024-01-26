@@ -358,7 +358,7 @@ const getCorrespondingRelationsToMainstructures = (epdsPointingToAgs, agMsMap) =
 }
 
 module.exports = {
-  sortEducationProgramme: sortEducationProgramme,
+  sortEducationProgramme,
   getRelatedSchoolEntities: getRelatedSchoolEntities,
   getRelatedSchools: getRelatedSchools,
   getCorrespondingRelationsToMainstructures,

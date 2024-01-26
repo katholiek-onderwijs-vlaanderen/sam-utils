@@ -1,6 +1,6 @@
 {
   "name": "@kathondvla/sam-utils",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Utils for the Samenscholing API that can be shared between projects",
   "scripts": {
     "lint": "eslint /sri-client"

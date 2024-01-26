@@ -534,7 +534,8 @@ module.exports = function (api, dateUtils) {
     return options;
   };
   const manageDatesForEducationalProgrammeDetailLocation = async function(epdLoc, batch, oldStartDate, oldEndDate, adaptEpds) {
-    const options = getOptionsForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate);
+    const options = getOptionsForEducationalProgrammeDetailLocation(epdLoc, batch, oldStartDate, oldEndDate);    
+    const ret = await dateUtils.manageDateChanges(epdLoc, options, api);
     if(adaptEpds) {
       /*options.references.push({
         href: '/sam/educationalprogrammedetails',
@@ -542,9 +543,10 @@ module.exports = function (api, dateUtils) {
         intermediateStrategy: 'FORCE',
         onlyEnlargePeriod: true
       });*/
-      await adaptEducationProgrammeDetailToAllLocations(epdLoc, batch, oldStartDate, oldEndDate);
+      const epd = await adaptEducationProgrammeDetailToAllLocations(epdLoc, batch, oldStartDate, oldEndDate);
+      ret.educationalProgrammeDetail = epd;
     }
-    return dateUtils.manageDateChanges(epdLoc, options, api);
+    return ret;
   };
   const manageDeletesForEducationalProgrammeDetailLocation = async function(epdLoc, batch, adaptEpds) {
     const options = getOptionsForEducationalProgrammeDetailLocation(epdLoc, batch);
