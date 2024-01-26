@@ -550,10 +550,14 @@ module.exports = function (api, dateUtils) {
   };
   const manageDeletesForEducationalProgrammeDetailLocation = async function(epdLoc, batch, adaptEpds) {
     const options = getOptionsForEducationalProgrammeDetailLocation(epdLoc, batch);
+    const ret = await dateUtils.manageDeletes(epdLoc, options, api);
     if(adaptEpds) {
-      await deleteEducationProgrammeDetailIfLastLocation(epdLoc, batch);
+      const epd = await deleteEducationProgrammeDetailIfLastLocation(epdLoc, batch);
+      if (epd) {
+        ret.educationalProgrammeDetail = epd;
+      }
     }
-    return dateUtils.manageDeletes(epdLoc, options, api);
+    return ret;
   };
 
   const adaptEducationProgrammeDetailToAllLocations = async (epdLoc, batch, oldStartDate, oldEndDate) => {
@@ -607,7 +611,7 @@ module.exports = function (api, dateUtils) {
         verb: 'DELETE'
       });
       await deleteEducationalProgrammeDetailsOfClasses(await api.get(epdLoc.educationalProgrammeDetail.href), batch);
-      return true;
+      return epdLoc.educationalProgrammeDetail.$$expanded ? epdLoc.educationalProgrammeDetail.$$expanded : true;
     }
   };
 
