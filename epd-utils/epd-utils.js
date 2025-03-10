@@ -14,6 +14,8 @@ const MODULAIR = '/sam/commons/agsoorten/3950a39a-2cc9-11e6-b392-005056872df5';
 const OBSERVATIEJAAR = '/sam/commons/buoopleidingen/cfadd072-77ef-11e5-a3ab-005056872df5';
 const POAH = '/sam/commons/buosoorten/cfa2d2bc-77ef-11e5-a3ab-005056872df5';
 
+const SEVENTH_YEAR = '/sam/commons/agsoorten/e67a966c-fdb6-11ef-baaa-0050568743ce';
+
 const leerwegSort = function (a, b) {
   if (a.leerweg && !b.leerweg) {
     return 1;
@@ -108,9 +110,13 @@ const sortEducationProgramme = function(epds, options = {}) {
       } 
       else if (a.soort.href === OKAN || b.soort.href === OKAN) {
         return a.soort.href === OKAN ? -1 : 1; // OKAN is always first
-      } else if(a.soort.href === HBO || b.soort.href === HBO || a.soort.href === MODULAIR || b.soort.href === MODULAIR) {
+      } else if(a.soort.href === HBO || b.soort.href === HBO || a.soort.href === MODULAIR || b.soort.href === MODULAIR || a.soort.href === SEVENTH_YEAR || b.soort.href === SEVENTH_YEAR) {
         if(a.soort.href !== b.soort.href) {
-          if(a.soort.href === MODULAIR) {
+          if (a.soort.href === SEVENTH_YEAR) {
+            return 1;
+          } else if (b.soort.href === SEVENTH_YEAR) {
+            return -1;
+          } else if(a.soort.href === MODULAIR) {
             return 1;
           } else if (b.soort.href === MODULAIR) {
             return -1;
