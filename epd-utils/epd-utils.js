@@ -14,8 +14,7 @@ const MODULAIR = '/sam/commons/agsoorten/3950a39a-2cc9-11e6-b392-005056872df5';
 const OBSERVATIEJAAR = '/sam/commons/buoopleidingen/cfadd072-77ef-11e5-a3ab-005056872df5';
 const POAH = '/sam/commons/buosoorten/cfa2d2bc-77ef-11e5-a3ab-005056872df5';
 
-const DERDE_GRAAD = '/sam/commons/graden/cf7491e0-77ef-11e5-a3ab-005056872df5';
-const DERDE_LEERJAAR = '/sam/commons/leerjaren/cf938ece-77ef-11e5-a3ab-005056872df5';
+const SEVENTH_YEAR = '/sam/commons/agsoorten/e67a966c-fdb6-11ef-baaa-0050568743ce';
 
 const leerwegSort = function (a, b) {
   if (a.leerweg && !b.leerweg) {
@@ -111,9 +110,13 @@ const sortEducationProgramme = function(epds, options = {}) {
       } 
       else if (a.soort.href === OKAN || b.soort.href === OKAN) {
         return a.soort.href === OKAN ? -1 : 1; // OKAN is always first
-      } else if(a.soort.href === HBO || b.soort.href === HBO || a.soort.href === MODULAIR || b.soort.href === MODULAIR) {
+      } else if(a.soort.href === HBO || b.soort.href === HBO || a.soort.href === MODULAIR || b.soort.href === MODULAIR || a.soort.href === SEVENTH_YEAR || b.soort.href === SEVENTH_YEAR) {
         if(a.soort.href !== b.soort.href) {
-          if(a.soort.href === MODULAIR) {
+          if (a.soort.href === SEVENTH_YEAR) {
+            return 1;
+          } else if (b.soort.href === SEVENTH_YEAR) {
+            return -1;
+          } else if(a.soort.href === MODULAIR) {
             return 1;
           } else if (b.soort.href === MODULAIR) {
             return -1;
@@ -135,24 +138,12 @@ const sortEducationProgramme = function(epds, options = {}) {
             return a.structuuronderdeel.$$expanded.name < b.structuuronderdeel.$$expanded.name ? -1 : 1;
           }
         } else { // for 2de & 3de graad: 1. onderwijsvorm 2. structuuronderdeel 3. leerjaar
-          if (!(a.leerjaar.href === DERDE_LEERJAAR && b.graad.href === DERDE_GRAAD) && !(b.leerjaar.href === DERDE_LEERJAAR && b.graad.href === DERDE_GRAAD)) {
-            // it concerns regular years and not the special 7th year
-            if(a.onderwijsvorm.href !== b.onderwijsvorm.href) {
-              return a.onderwijsvorm.$$expanded.code < b.onderwijsvorm.$$expanded.code ? -1 : 1;
-            } else if(a.structuuronderdeel.href !== b.structuuronderdeel.href) {
-              return a.structuuronderdeel.$$expanded.name < b.structuuronderdeel.$$expanded.name ? -1 : 1;
-            } else {
-              return a.leerjaar.$$expanded.code - b.leerjaar.$$expanded.code;
-            }
+          if(a.onderwijsvorm.href !== b.onderwijsvorm.href) {
+            return a.onderwijsvorm.$$expanded.code < b.onderwijsvorm.$$expanded.code ? -1 : 1;
+          } else if(a.structuuronderdeel.href !== b.structuuronderdeel.href) {
+            return a.structuuronderdeel.$$expanded.name < b.structuuronderdeel.$$expanded.name ? -1 : 1;
           } else {
-            // one of the AG's is in the 7th year
-            if (a.leerjaar.href === DERDE_LEERJAAR && !b.leerjaar.href === DERDE_LEERJAAR) {
-              return 1;
-            } else if (!a.leerjaar.href === DERDE_LEERJAAR && b.leerjaar.href === DERDE_LEERJAAR) {
-              return -1;
-            } else {
-              return a.structuuronderdeel.$$expanded.name < b.structuuronderdeel.$$expanded.name ? -1 : 1;
-            }
+            return a.leerjaar.$$expanded.code - b.leerjaar.$$expanded.code;
           }
         }
       }
