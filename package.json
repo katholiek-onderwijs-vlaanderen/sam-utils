@@ -15,7 +15,7 @@
     "lodash.clonedeep": "^4.5.0"
   },
   "devDependencies": {
-    "eslint": "4.13.1"
+    "eslint": "9.22.0"
   },
   "repository": {
     "type": "git",
